@@ -7,6 +7,9 @@ export default function Boids() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
+    const flock = new Flock(200, canvas.width, canvas.height)
     const resize = () => {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
@@ -14,7 +17,6 @@ export default function Boids() {
       flock.height = canvas.height
     }
     resize()
-    const flock = new Flock(200, canvas.width, canvas.height)
     window.addEventListener('resize', resize)
     let animFrameId: number
     let lastTime = performance.now()
