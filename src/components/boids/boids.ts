@@ -22,8 +22,8 @@ export class Boid {
   }
 
   update(dt: number) {
-    this.x += this.vx * dt
-    this.y += this.vy * dt
+    this.x += this.vx * dt * 0.1
+    this.y += this.vy * dt * 0.1
   }
 
   draw(ctx: CanvasRenderingContext2D) {
