@@ -8,6 +8,9 @@ export default function Home() {
   useEffect(() => {
     document.body.style.margin = '0'
     document.body.style.padding = '0'
+    document.body.style.backgroundColor = '#030712'
+    document.documentElement.style.backgroundColor = '#030712'
+    document.documentElement.style.overscrollBehavior = 'none'
   }, [])
 
   const handleReset = () => {
