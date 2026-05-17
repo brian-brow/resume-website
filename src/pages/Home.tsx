@@ -12,11 +12,11 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gray-950 text-white">
+    <div className="relative min-h-screen bg-gray-950 text-white overflow-y-auto md:overflow-hidden">
       <div className="absolute inset-0">
         <Boids resetRef={resetRef}/>
       </div>
-      <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: 'clamp(40px, 8vw, 150px)' }}>
+      <div className="relative md:absolute md:inset-0 z-10 pointer-events-none" style={{ padding: 'clamp(40px, 8vw, 150px)' }}>
         <div className="relative w-full h-full">
           <button
             className="absolute top-4 right-4 pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 flex items-center justify-center text-lg"
