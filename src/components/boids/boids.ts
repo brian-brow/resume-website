@@ -35,6 +35,7 @@ export class Boid {
     ctx.beginPath()
     ctx.moveTo(size, 0)
     ctx.lineTo(-size, size / 2)
+    ctx.lineTo(-size * 0.4, 0)
     ctx.lineTo(-size, -size / 2)
     ctx.closePath()
     ctx.fillStyle = 'white'
