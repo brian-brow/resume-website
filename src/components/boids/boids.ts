@@ -192,6 +192,13 @@ export class Flock {
     }
   }
 
+  reset() {
+    this.boids = Array.from({ length: this.boids.length }, () => new Boid(
+      Math.random() * this.width,
+      Math.random() * this.height
+    ))
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
     for (const boid of this.boids) {
       boid.draw(ctx)

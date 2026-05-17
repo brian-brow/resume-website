@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Flock } from './boids'
-export default function Boids() {
+export default function Boids({ resetRef }: { resetRef?: React.MutableRefObject<(() => void) | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const canvas = canvasRef.current
@@ -10,6 +10,10 @@ export default function Boids() {
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
     const flock = new Flock(200, canvas.width, canvas.height)
+    if (resetRef) {
+      resetRef.current = () => flock.reset()
+      console.log('resetRef set', resetRef.current)
+    }
     const resize = () => {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight

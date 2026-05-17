@@ -1,17 +1,41 @@
+import { useRef, useState } from 'react'
 import Boids from '@/components/boids/Boids'
 export default function Home() {
+  const resetRef = useRef<(() => void) | null>(null)
+  const [spinning, setSpinning] = useState(false)
+
+  const [spinCount, setSpinCount] = useState(0)
+
+  const handleReset = () => {
+    console.log('handleReset called', resetRef.current)
+    resetRef.current?.()
+    setSpinCount(n => n + 1)
+    // setTimeout(() => setSpinning(false), 100)
+  }
+
   return (
     <div className="relative min-h-screen bg-gray-950 text-white">
       <div className="absolute inset-0">
-        <Boids />
+        <Boids resetRef={resetRef}/>
       </div>
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: '150px' }}>
+        <button
+          className="absolute pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 active:text-white active:border-gray-400 flex items-center justify-center text-lg"
+          style={{ top: '158px', right: '158px', transition: 'transform 0.3s ease, color 0.2s, border-color 0.2s' }}
+          onClick={handleReset}
+          title="Reset boids"
+        >
+          <span style={{ display: 'inline-block', transition: 'transform 0.4s ease', transform: `rotate(${-spinCount * 360}deg)`}}>
+            ↺
+          </span>
+        </button>
         <div className="flex flex-col items-center justify-center h-full">
           <div className="w-full max-w-2xl">
             <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800 pointer-events-auto">
               <h1 className="text-5xl font-bold tracking-tight">Brian Brown</h1>
               <p className="text-gray-400 mt-4 text-lg">
-                This is a placeholder page. More coming soon.
+                Software Engineer at the Loxahatchee River District.<br />
+                CS grad from the University of Florida.
               </p>
               <div className="mt-8 flex gap-4">
                 <a
