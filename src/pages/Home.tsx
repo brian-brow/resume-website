@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
 import Boids from '@/components/boids/Boids'
+import BoidsModal from '@/components/boids/BoidsModal'
 export default function Home() {
   const resetRef = useRef<(() => void) | null>(null)
   const [spinCount, setSpinCount] = useState(0)
+  const [modalOpen, setModalOpen] = useState(false)
   const margin = window.innerWidth < 768 ? 20 : 150
 
   useEffect(() => {
@@ -27,6 +29,14 @@ export default function Home() {
       </div>
       <div className="relative md:absolute md:inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">
+          <button
+            className="absolute top-2 left-2 pointer-events-auto w-8 h-8 text-gray-400 hover:text-white active:scale-90 flex items-center justify-center text-xl leading-none"
+            style={{ transition: 'color 0.2s, transform 0.1s' }}
+            onClick={() => setModalOpen(true)}
+            title="About boids"
+          >
+            ⓘ
+          </button>
           <button
             className="absolute top-4 right-4 pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 flex items-center justify-center text-lg"
             style={{ transition: 'transform 0.3s ease, color 0.2s, border-color 0.2s' }}
@@ -73,6 +83,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          {modalOpen && <BoidsModal onClose={() => setModalOpen(false)} />}
         </div>
       </div>
     </div>

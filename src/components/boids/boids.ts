@@ -121,6 +121,11 @@ export class Flock {
 
         if (distSq > boid1.visionRadius * boid1.visionRadius) continue
 
+        const angle = Math.atan2(boid1.vy, boid1.vx)
+        const toBoid2 = Math.atan2(dy * -1, dx * -1) // flip because dx/dy is boid1-boid2
+        const angleDiff = Math.abs(((toBoid2 - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI)
+        if (angleDiff > Math.PI * 0.75) continue
+
         ctx.beginPath()
         ctx.moveTo(boid1.x, boid1.y)
         ctx.lineTo(boid2.x, boid2.y)
