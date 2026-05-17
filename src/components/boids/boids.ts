@@ -1,4 +1,6 @@
 export class Boid {
+  x: number
+  y: number
   vx: number
   vy: number
 
@@ -11,15 +13,17 @@ export class Boid {
   visionRadius = 125
   avoidRadius = 40
 
-  constructor(public x: number, public y: number) {
+  constructor(x: number, y: number) {
     const angle = Math.random() * Math.PI * 2
+    this.x = x
+    this.y = y
     this.vx = Math.cos(angle) * this.minSpeed
     this.vy = Math.sin(angle) * this.minSpeed
   }
 
   update(dt: number) {
-    this.x += this.vx
-    this.y += this.vy
+    this.x += this.vx * dt
+    this.y += this.vy * dt
   }
 
   draw(ctx: CanvasRenderingContext2D) {
