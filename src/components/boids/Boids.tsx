@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Flock } from './boids'
-export default function Boids({ resetRef }: { resetRef?: React.MutableRefObject<(() => void) | null> }) {
+export default function Boids({ resetRef, shockwaveRef }: {
+  resetRef?: React.MutableRefObject<(() => void) | null>
+  shockwaveRef?: React.MutableRefObject<((x: number, y: number) => void) | null>
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const canvas = canvasRef.current
@@ -11,10 +14,8 @@ export default function Boids({ resetRef }: { resetRef?: React.MutableRefObject<
     canvas.height = canvas.offsetHeight
     const margin = window.innerWidth < 768 ? 20 : 150
     const flock = new Flock(200, canvas.width, canvas.height, margin)
-    if (resetRef) {
-      resetRef.current = () => flock.reset()
-      console.log('resetRef set', resetRef.current)
-    }
+    if (resetRef) resetRef.current = () => flock.reset()
+    if (shockwaveRef) shockwaveRef.current = (x, y) => flock.addShockwave(x, y)
     const resize = () => {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
