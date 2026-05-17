@@ -90,11 +90,13 @@ export class Flock {
   boids: Boid[]
   width: number
   height: number
+  margin: number
   shockwaves: Shockwave[] = []
 
-  constructor(count: number, width: number, height: number) {
+  constructor(count: number, width: number, height: number, margin: number = 150) {
     this.width = width
     this.height = height
+    this.margin = margin
     this.boids = Array.from({ length: count }, () => new Boid(
       Math.random() * width,
       Math.random() * height
@@ -102,7 +104,7 @@ export class Flock {
   }
 
   pathfind(ctx: CanvasRenderingContext2D) {
-    const margin = 150
+    const margin = this.margin
 
     for (const boid1 of this.boids) {
       let close_dx = 0, close_dy = 0

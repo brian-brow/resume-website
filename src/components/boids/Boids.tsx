@@ -9,7 +9,8 @@ export default function Boids({ resetRef }: { resetRef?: React.MutableRefObject<
     if (!ctx) return
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
-    const flock = new Flock(200, canvas.width, canvas.height)
+    const margin = window.innerWidth < 768 ? 20 : 150
+    const flock = new Flock(200, canvas.width, canvas.height, margin)
     if (resetRef) {
       resetRef.current = () => flock.reset()
       console.log('resetRef set', resetRef.current)
@@ -39,7 +40,7 @@ export default function Boids({ resetRef }: { resetRef?: React.MutableRefObject<
       lastTime = time
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      const margin = 150
+      const margin = flock.margin
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
       ctx.lineWidth = 1
       ctx.strokeRect(margin, margin, canvas.width - margin * 2, canvas.height - margin * 2)
