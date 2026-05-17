@@ -2,8 +2,6 @@ import { useRef, useState } from 'react'
 import Boids from '@/components/boids/Boids'
 export default function Home() {
   const resetRef = useRef<(() => void) | null>(null)
-  const [spinning, setSpinning] = useState(false)
-
   const [spinCount, setSpinCount] = useState(0)
 
   const handleReset = () => {
