@@ -1,17 +1,22 @@
 import { useNavigate } from 'react-router-dom'
-import { useBoids } from '@/components/boids/context/BoidsContext'
+// import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function Bio() {
-  const shockwaveRef = useBoids()
+  // const { resetRef, shockwaveRef } = useBoids()
   const navigate = useNavigate()
  
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
-  }
+  // const handleReset = () => {
+  //   resetRef.current?.()
+  //   setSpinCount(n => n + 1)
+  // }
+
+  // const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  //   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  //   shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
+  // }
 
   return (
-    <div className="relative min-h-screen text-white overflow-y-auto" onClick={handleCanvasClick}>
+    <div className="relative min-h-screen text-white overflow-y-auto">
       <div className="max-w-2xl mx-auto px-6 py-16">
         <button
           className="mb-8 text-gray-500 hover:text-white transition-colors text-sm"

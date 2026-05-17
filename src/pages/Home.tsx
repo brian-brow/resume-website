@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import BoidsModal from '@/components/boids/BoidsModal'
 import { useBoids } from '@/components/boids/context/BoidsContext'
 
