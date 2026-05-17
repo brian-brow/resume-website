@@ -34,6 +34,12 @@ export default function Boids() {
       const dt = Math.min(time - lastTime, 10)
       lastTime = time
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const margin = 150
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+      ctx.lineWidth = 1
+      ctx.strokeRect(margin, margin, canvas.width - margin * 2, canvas.height - margin * 2)
+
       flock.update(dt, ctx)
       flock.draw(ctx)
       animFrameId = requestAnimationFrame(loop)
