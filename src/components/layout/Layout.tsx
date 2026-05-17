@@ -3,9 +3,9 @@ import Navbar from './Navbar'
 
 export default function Layout() {
   return (
-    <div>
+    <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      <main style={{ padding: '1rem' }}>
+      <main>
         <Outlet />
       </main>
     </div>
