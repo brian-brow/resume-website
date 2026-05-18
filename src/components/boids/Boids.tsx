@@ -24,15 +24,9 @@ export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, 
 
     if (resetRef) resetRef.current = () => flock.reset()
     if (linesRef) linesRef.current = () => flock.toggleLines()
-    if (shockwaveRef) shockwaveRef.current = (x, y) => {
-      console.log('testttt')
-      flock.addShockwave(x, y)
-    }
+    if (shockwaveRef) shockwaveRef.current = (x, y) => flock.addShockwave(x, y)
     if (getParamsRef) getParamsRef.current = () => flock.getParams()
-    if (updateParamsRef) updateParamsRef.current = (params) => {
-      console.log('updateParams called')
-      flock.updateParams(params)
-    }
+    if (updateParamsRef) updateParamsRef.current = (params) => flock.updateParams(params)
 
     const resize = () => {
       canvas.width = canvas.offsetWidth
@@ -62,7 +56,7 @@ export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, 
     canvas.addEventListener('click', onClick)
 
     const loop = (time: number) => {
-      const dt = Math.min(time - lastTime, 10)
+      const dt = Math.min(time - lastTime, 50)
       lastTime = time
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
