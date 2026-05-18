@@ -59,7 +59,7 @@ export default function Home() {
               <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 pointer-events-auto">
                 {[
                   { label: 'Dotfiles', img: '/arch.png', alt: 'Arch Linux', desc: 'Arch Linux / Hyprland dotfiles', href: 'https://github.com/brian-brow/dotfiles', to: null },
-                  { label: 'Bio', img: '/favicon.png', alt: 'Brian Brown', desc: 'About me', href: null, to: '/bio' },
+                  { label: 'Bio', img: '/favicon.png', alt: 'Brian Brown', desc: 'Professional Experience / Education', href: null, to: '/bio' },
                   { label: 'Feature three', img: null, alt: '', desc: 'Placeholder description goes here', href: null, to: null },
                 ].map((f) => {
                     const card = (
