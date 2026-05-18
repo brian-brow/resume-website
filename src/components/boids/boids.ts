@@ -5,6 +5,7 @@ export class Boid {
   vy: number
 
   // ol reliable
+  //
   // matchingFactor = 0.002
   // centeringFactor = 0.0002
   // avoidFactor = 0.002
@@ -139,7 +140,7 @@ export class Flock {
         const angle = Math.atan2(boid1.vy, boid1.vx)
         const toBoid2 = Math.atan2(dy * -1, dx * -1) // flip because dx/dy is boid1-boid2
         const angleDiff = Math.abs(((toBoid2 - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI)
-        // if (angleDiff > Math.PI * 0.75) continue
+        if (angleDiff > Math.PI * 0.75) continue
 
         if (this.lines) {
           ctx.beginPath()
