@@ -69,57 +69,62 @@ export default function Bio() {
             <h2 className="text-2xl font-bold mb-6">Projects</h2>
             <div className="flex flex-col gap-6">
 
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-lg">Archive Vision</h3>
-                  <span className="text-gray-500 text-sm">Senior Capstone</span>
+              {/* Archive Vision - Featured */}
+              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 relative overflow-hidden">
+                {/* Subtle accent line */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent" />
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-lg">Archive Vision</h3>
+                    <span className="text-xs border border-gray-600 text-gray-400 px-2 py-0.5 rounded-full">
+                      Senior Capstone
+                    </span>
+                  </div>
                 </div>
-                <p className="text-gray-400 text-sm mt-2">
-                  A mobile application for digitizing and querying archival documents. Built OCR/HTR pipelines using HuggingFace models to extract text from scanned documents, organized into searchable collections backed by ChromaDB vector embeddings. Developed a RAG-based chatbot powered by OpenAI/Gemini with contextual knowledge of user collections. Backend built with FastAPI, async job processing via Celery and Redis, and MariaDB for relational data. Deployed via Docker Compose.
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  A mobile application for digitizing and querying archival documents using OCR/HTR pipelines,
+                  vector search via ChromaDB, and a RAG-based chatbot backed by OpenAI/Gemini. Built on FastAPI
+                  with async job processing via Celery and Redis, deployed via Docker Compose.
                 </p>
-                <div className="mt-3 flex gap-2 flex-wrap">
+                <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+                  Currently in talks with the University of Florida to continue development and adopt the
+                  platform across university departments.
+                </p>
+                <div className="mt-4 flex gap-2 flex-wrap">
                   {['Python', 'FastAPI', 'ChromaDB', 'HuggingFace', 'Celery', 'Redis', 'MariaDB', 'React Native'].map(t => (
                     <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-lg">Boid Flocking Simulation</h3>
-                  <a href="https://boid-simulation.web.app/" target="_blank" rel="noopener noreferrer" className="text-gray-500 text-sm hover:text-white transition-colors">Live ↗</a>
+              {/* Secondary projects - side by side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
+                  <h3 className="font-semibold text-lg mb-2">Craven</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Recipe-matching web app with a preference-based suggestion algorithm. RESTful backend
+                    with Node.js/Express, MongoDB, and a React frontend.
+                  </p>
+                  <div className="mt-4 flex gap-2 flex-wrap">
+                    {['Node.js', 'Express', 'MongoDB', 'React'].map(t => (
+                      <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-gray-400 text-sm mt-2">
-                  Real-time Boids flocking simulation with configurable rule weights. Node.js/Express backend with a React and p5.js frontend.
-                </p>
-                <div className="mt-3 flex gap-2 flex-wrap">
-                  {['Node.js', 'Express', 'React', 'p5.js'].map(t => (
-                    <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
-                  ))}
-                </div>
-              </div>
 
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-                <h3 className="font-semibold text-lg">Craven</h3>
-                <p className="text-gray-400 text-sm mt-2">
-                  Web application enabling users to browse and match with recipes based on preferences, featuring a suggestion algorithm. RESTful backend with Node.js and Express, MongoDB for user preferences and saved recipes, and a React.js frontend.
-                </p>
-                <div className="mt-3 flex gap-2 flex-wrap">
-                  {['Node.js', 'Express', 'MongoDB', 'React'].map(t => (
-                    <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-                <h3 className="font-semibold text-lg">3D Graphics Engine</h3>
-                <p className="text-gray-400 text-sm mt-2">
-                  Designed a 3D graphics engine in OpenGL and SDL with a traversable environment.
-                </p>
-                <div className="mt-3 flex gap-2 flex-wrap">
-                  {['C++', 'OpenGL', 'SDL'].map(t => (
-                    <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
-                  ))}
+                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">3D Graphics Engine</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      Custom 3D graphics engine built in C++ with OpenGL and SDL, featuring a
+                      fully traversable environment.
+                    </p>
+                  </div>
+                  <div className="mt-4 flex gap-2 flex-wrap">
+                    {['C++', 'OpenGL', 'SDL'].map(t => (
+                      <span key={t} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{t}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -150,8 +155,8 @@ export default function Bio() {
                       'Machine Learning Engineering',
                       'Natural Language Processing',
                     ].map(c => (
-                      <span key={c} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{c}</span>
-                    ))}
+                        <span key={c} className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-md">{c}</span>
+                      ))}
                   </div>
                 </div>
               </div>
