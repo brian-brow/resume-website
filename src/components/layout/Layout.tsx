@@ -1,13 +1,12 @@
 import { Outlet } from 'react-router-dom'
 import { useState } from 'react'
-import Navbar from './Navbar'
 import Boids from '@/components/boids/Boids'
 import BoidsModal from '@/components/boids/BoidsModal'
 import BoidsControls from '@/components/boids/BoidsControls'
 import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function Layout() {
-  const { resetRef, shockwaveRef, getParamsRef, updateParamsRef } = useBoids()
+  const { resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef } = useBoids()
   const [spinCount, setSpinCount] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const [controlsOpen, setControlsOpen] = useState(false)
@@ -18,6 +17,10 @@ export default function Layout() {
     setSpinCount(n => n + 1)
   }
 
+  const toggleLines = () => {
+    linesRef.current?.()
+  }
+
   const handleCanvasClick = (e: React.MouseEvent<HTMLElement>) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
@@ -26,7 +29,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-gray-950 text-white overflow-hidden relative">
       <div className="absolute inset-0">
-        <Boids resetRef={resetRef} shockwaveRef={shockwaveRef} getParamsRef={getParamsRef} updateParamsRef={updateParamsRef}/>
+        <Boids resetRef={resetRef} shockwaveRef={shockwaveRef} linesRef={linesRef} getParamsRef={getParamsRef} updateParamsRef={updateParamsRef}/>
       </div>
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">
@@ -58,11 +61,23 @@ export default function Layout() {
               <img src="/settings.svg" alt="settings" className="w-8 h-8 invert opacity-40 group-hover:opacity-100 transition-opacity" />
             </span>
           </button>
+          <button
+            className="absolute bottom-2 right-2 pointer-events-auto w-8 h-8 active:scale-90 flex items-center justify-center text-gray-500 hover:text-white transition-all duration-200"
+            onClick={toggleLines}
+            title="Toggle connection lines"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="3" cy="3" r="2"/>
+              <circle cx="15" cy="15" r="2"/>
+              <circle cx="15" cy="3" r="2"/>
+              <line x1="3" y1="3" x2="15" y2="15"/>
+              <line x1="15" y1="3" x2="3" y2="3"/>
+            </svg>
+          </button>
         </div>
       </div>
       {modalOpen && <BoidsModal onClose={() => setModalOpen(false)} />}
       {controlsOpen && <BoidsControls onClose={() => setControlsOpen(false)} />}
-      <Navbar />
       <main className="absolute inset-0 overflow-y-auto" onClick={handleCanvasClick}>
         <Outlet />
       </main>

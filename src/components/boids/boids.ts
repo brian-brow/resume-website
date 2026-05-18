@@ -4,14 +4,24 @@ export class Boid {
   vx: number
   vy: number
 
-  matchingFactor = 0.002
-  centeringFactor = 0.0002
-  avoidFactor = 0.002
-  turnFactor = 0.1
-  maxSpeed = 4.5
-  minSpeed = 3.0
-  visionRadius = 125
-  avoidRadius = 40
+  // ol reliable
+  // matchingFactor = 0.002
+  // centeringFactor = 0.0002
+  // avoidFactor = 0.002
+  // turnFactor = 0.1
+  // maxSpeed = 4.5
+  // minSpeed = 3.0
+  // visionRadius = 125
+  // avoidRadius = 40
+
+  matchingFactor = 0.016
+  centeringFactor = 0.0005
+  avoidFactor = 0.01
+  turnFactor = 0.14
+  maxSpeed = 8.0
+  minSpeed = 2.5
+  visionRadius = 120
+  avoidRadius = 25
 
   constructor(x: number, y: number) {
     const angle = Math.random() * Math.PI * 2
@@ -66,7 +76,7 @@ export class Shockwave {
     // draw ring
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.diam / 2, 0, Math.PI * 2)
-    // ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity / 255})`
+    ctx.strokeStyle = `rgba(0,0,0,0)`
     ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity / 255 / 3})`
     ctx.fill()
     ctx.stroke()
@@ -92,12 +102,14 @@ export class Flock {
   width: number
   height: number
   margin: number
+  lines: boolean
   shockwaves: Shockwave[] = []
 
   constructor(count: number, width: number, height: number, margin: number = 150) {
     this.width = width
     this.height = height
     this.margin = margin
+    this.lines = false
     this.boids = Array.from({ length: count }, () => new Boid(
       Math.random() * width,
       Math.random() * height
@@ -108,6 +120,8 @@ export class Flock {
     const margin = this.margin
 
     for (const boid1 of this.boids) {
+      const prevVx = boid1.vx
+      const prevVy = boid1.vy
       let close_dx = 0, close_dy = 0
       let avg_vx = 0, avg_vy = 0
       let avg_px = 0, avg_py = 0
@@ -125,13 +139,15 @@ export class Flock {
         const angle = Math.atan2(boid1.vy, boid1.vx)
         const toBoid2 = Math.atan2(dy * -1, dx * -1) // flip because dx/dy is boid1-boid2
         const angleDiff = Math.abs(((toBoid2 - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI)
-        if (angleDiff > Math.PI * 0.75) continue
+        // if (angleDiff > Math.PI * 0.75) continue
 
-        ctx.beginPath()
-        ctx.moveTo(boid1.x, boid1.y)
-        ctx.lineTo(boid2.x, boid2.y)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-        ctx.stroke()
+        if (this.lines) {
+          ctx.beginPath()
+          ctx.moveTo(boid1.x, boid1.y)
+          ctx.lineTo(boid2.x, boid2.y)
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+          ctx.stroke()
+        }
 
         // alignment
         avg_vx += boid2.vx
@@ -172,6 +188,16 @@ export class Flock {
       if (boid1.y > this.height - margin) boid1.vy -= boid1.turnFactor
       if (boid1.y < margin) boid1.vy += boid1.turnFactor
 
+      // clamp steering force  <-- ADD THIS before speed clamp
+      const maxSteerForce = 0.5
+      const dvx = boid1.vx - prevVx
+      const dvy = boid1.vy - prevVy
+      const dv = Math.sqrt(dvx * dvx + dvy * dvy)
+      if (dv > maxSteerForce) {
+        boid1.vx = prevVx + (dvx / dv) * maxSteerForce
+        boid1.vy = prevVy + (dvy / dv) * maxSteerForce
+      }
+
       // clamp speed
       const speed = Math.sqrt(boid1.vx * boid1.vx + boid1.vy * boid1.vy)
       if (speed > boid1.maxSpeed) {
@@ -198,6 +224,10 @@ export class Flock {
     for (const shockwave of this.shockwaves) {
       shockwave.update(ctx, this.boids)
     }
+  }
+
+  toggleLines() {
+    this.lines = !this.lines
   }
 
   updateParams(params: Partial<Pick<Boid, 'matchingFactor' | 'centeringFactor' | 'avoidFactor' | 'turnFactor' | 'maxSpeed' | 'minSpeed' | 'visionRadius' | 'avoidRadius'>>) {

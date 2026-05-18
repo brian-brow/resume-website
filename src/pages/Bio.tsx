@@ -14,7 +14,7 @@ export default function Bio() {
     <div className="relative min-h-screen text-white overflow-y-auto">
       <div className="max-w-3xl mx-auto px-6 py-16 relative">
         <button
-          className="fixed top-[158px] text-gray-500 hover:text-white transition-colors text-sm"
+          className="fixed top-[164px] text-gray-500 hover:text-white transition-colors text-sm"
           style={{ left: 'calc(50% - 768px/2 - 48px)' }}
           onClick={(e) => { e.stopPropagation(); navigate('/') }}
         >

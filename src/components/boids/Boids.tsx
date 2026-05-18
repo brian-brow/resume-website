@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Flock } from './boids'
-export default function Boids({ resetRef, shockwaveRef, getParamsRef, updateParamsRef }: {
+export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef }: {
   resetRef?: React.MutableRefObject<(() => void) | null>
   shockwaveRef?: React.MutableRefObject<((x: number, y: number) => void) | null>
+  linesRef?: React.MutableRefObject<(() => void) | null>
   getParamsRef?: React.MutableRefObject<(() => any) | null>
   updateParamsRef?: React.MutableRefObject<((params: any) => void) | null>
 }) {
@@ -22,6 +23,7 @@ export default function Boids({ resetRef, shockwaveRef, getParamsRef, updatePara
     const flock = new Flock(count, canvas.width, canvas.height, margin)
 
     if (resetRef) resetRef.current = () => flock.reset()
+    if (linesRef) linesRef.current = () => flock.toggleLines()
     if (shockwaveRef) shockwaveRef.current = (x, y) => {
       console.log('testttt')
       flock.addShockwave(x, y)
