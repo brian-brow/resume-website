@@ -4,7 +4,7 @@ export class Boid {
   vx: number
   vy: number
 
-  matchingFactor = 0.02
+  matchingFactor = 0.002
   centeringFactor = 0.0002
   avoidFactor = 0.002
   turnFactor = 0.1
@@ -197,6 +197,26 @@ export class Flock {
     this.shockwaves = this.shockwaves.filter(s => !s.done)
     for (const shockwave of this.shockwaves) {
       shockwave.update(ctx, this.boids)
+    }
+  }
+
+  updateParams(params: Partial<Pick<Boid, 'matchingFactor' | 'centeringFactor' | 'avoidFactor' | 'turnFactor' | 'maxSpeed' | 'minSpeed' | 'visionRadius' | 'avoidRadius'>>) {
+    for (const boid of this.boids) {
+      Object.assign(boid, params)
+    }
+  }
+
+  getParams(): Pick<Boid, 'matchingFactor' | 'centeringFactor' | 'avoidFactor' | 'turnFactor' | 'maxSpeed' | 'minSpeed' | 'visionRadius' | 'avoidRadius'> {
+    const b = this.boids[0]
+    return {
+      matchingFactor: b.matchingFactor,
+      centeringFactor: b.centeringFactor,
+      avoidFactor: b.avoidFactor,
+      turnFactor: b.turnFactor,
+      maxSpeed: b.maxSpeed,
+      minSpeed: b.minSpeed,
+      visionRadius: b.visionRadius,
+      avoidRadius: b.avoidRadius,
     }
   }
 

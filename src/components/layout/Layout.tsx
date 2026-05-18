@@ -3,12 +3,14 @@ import { useState } from 'react'
 import Navbar from './Navbar'
 import Boids from '@/components/boids/Boids'
 import BoidsModal from '@/components/boids/BoidsModal'
+import BoidsControls from '@/components/boids/BoidsControls'
 import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function Layout() {
-  const { resetRef, shockwaveRef } = useBoids()
+  const { resetRef, shockwaveRef, getParamsRef, updateParamsRef } = useBoids()
   const [spinCount, setSpinCount] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
+  const [controlsOpen, setControlsOpen] = useState(false)
   const margin = window.innerWidth < 768 ? 20 : 150
 
   const handleReset = () => {
@@ -24,7 +26,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-gray-950 text-white overflow-hidden relative">
       <div className="absolute inset-0">
-        <Boids resetRef={resetRef} shockwaveRef={shockwaveRef} />
+        <Boids resetRef={resetRef} shockwaveRef={shockwaveRef} getParamsRef={getParamsRef} updateParamsRef={updateParamsRef}/>
       </div>
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">
@@ -46,9 +48,20 @@ export default function Layout() {
               ↺
             </span>
           </button>
+          <button
+            className="absolute bottom-2 left-2 pointer-events-auto w-8 h-8 active:scale-90 flex items-center justify-center group"
+            style={{ transition: 'transform 0.1s' }}
+            onClick={() => { setControlsOpen(true); setSpinCount(n => n + 1) }}
+            title="Boid parameters"
+          >
+            <span style={{ display: 'inline-block', transition: 'transform 0.4s ease', transform: `rotate(${spinCount * 180}deg)` }}>
+              <img src="/settings.svg" alt="settings" className="w-8 h-8 invert opacity-40 group-hover:opacity-100 transition-opacity" />
+            </span>
+          </button>
         </div>
       </div>
       {modalOpen && <BoidsModal onClose={() => setModalOpen(false)} />}
+      {controlsOpen && <BoidsControls onClose={() => setControlsOpen(false)} />}
       <Navbar />
       <main className="absolute inset-0 overflow-y-auto" onClick={handleCanvasClick}>
         <Outlet />
