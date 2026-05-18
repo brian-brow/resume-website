@@ -20,7 +20,7 @@ export default function Bio() {
         >
           ← Back
         </button>
-        <div className="max-w-2xl mx-auto" onClick={e => e.stopPropagation()}>
+        <div className="max-w-2xl mx-auto pt-8" onClick={e => e.stopPropagation()}>
 
           {/* Work History */}
           <section className="mb-16">
