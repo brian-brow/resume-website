@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useBoids } from '@/components/boids/context/BoidsContext'
 
 const PARAMS = [
-  { key: 'matchingFactor', label: 'Alignment', min: 0, max: 0.1, step: 0.001, default: 0.02 },
+  { key: 'matchingFactor', label: 'Alignment', min: 0, max: 0.1, step: 0.001, default: 0.002 },
   { key: 'centeringFactor', label: 'Cohesion', min: 0, max: 0.001, step: 0.00001, default: 0.0002 },
   { key: 'avoidFactor', label: 'Separation', min: 0, max: 0.02, step: 0.0001, default: 0.002 },
   { key: 'turnFactor', label: 'Turn Factor', min: 0, max: 0.5, step: 0.01, default: 0.1 },
@@ -30,7 +30,7 @@ export default function BoidsControls({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-sm mx-4"
+        className="relative bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 w-full max-w-sm mx-4"
         onClick={e => e.stopPropagation()}
       >
         <button
@@ -59,16 +59,31 @@ export default function BoidsControls({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </div>
-        <button
-          className="mt-6 text-sm text-gray-500 hover:text-white transition-colors"
-          onClick={() => {
-            const defaults = Object.fromEntries(PARAMS.map(p => [p.key, p.default]))
-            setValues(defaults)
-            updateParamsRef.current?.(defaults)
-          }}
-        >
-          Reset to defaults
-        </button>
+        <div className="mt-6 flex justify-between">
+          <button
+            className="text-sm text-gray-500 hover:text-white transition-colors"
+            onClick={() => {
+              const defaults = Object.fromEntries(PARAMS.map(p => [p.key, p.default]))
+              setValues(defaults)
+              updateParamsRef.current?.(defaults)
+            }}
+          >
+            Reset to defaults
+          </button>
+          <button
+            className="text-sm text-gray-500 hover:text-white transition-colors"
+            onClick={() => {
+              const random = Object.fromEntries(PARAMS.map(p => [
+                p.key,
+                parseFloat((Math.random() * (p.max - p.min) + p.min).toFixed(6))
+              ]))
+              setValues(random)
+              updateParamsRef.current?.(random)
+            }}
+          >
+            Random values
+          </button>
+        </div>
       </div>
     </div>
   )

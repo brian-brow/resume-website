@@ -5,7 +5,7 @@ export default function BoidsModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full mx-4"
+        className="relative bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 max-w-md w-full mx-4"
         onClick={e => e.stopPropagation()}
       >
         <button
