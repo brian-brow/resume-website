@@ -19,7 +19,7 @@ export class Boid {
   centeringFactor = 0.0005
   avoidFactor = 0.015
   turnFactor = 0.14
-  maxSpeed = 8.0
+  maxSpeed = 6.0
   minSpeed = 2.5
   visionRadius = 120
   avoidRadius = 25
