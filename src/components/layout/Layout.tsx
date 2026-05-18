@@ -31,7 +31,7 @@ export default function Layout() {
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">
           <button
-            className="absolute top-2 left-2 pointer-events-auto w-8 h-8 text-gray-400 hover:text-white active:scale-90 flex items-center justify-center text-xl leading-none"
+            className="absolute top-2 left-2 pointer-events-auto w-8 h-8 text-gray-400 hover:text-white active:scale-90 flex items-center justify-center text-3xl leading-none"
             style={{ transition: 'color 0.2s, transform 0.1s' }}
             onClick={() => setModalOpen(true)}
             title="About boids"
@@ -39,7 +39,7 @@ export default function Layout() {
             ⓘ
           </button>
           <button
-            className="absolute top-4 right-4 pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 flex items-center justify-center text-lg"
+            className="absolute top-2 right-2 pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 flex items-center justify-center text-lg"
             style={{ transition: 'transform 0.3s ease, color 0.2s, border-color 0.2s' }}
             onClick={handleReset}
             title="Reset boids"
