@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import Navbar from './Navbar'
 import Boids from '@/components/boids/Boids'
 import BoidsModal from '@/components/boids/BoidsModal'

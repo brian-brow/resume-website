@@ -5,7 +5,6 @@ import BoidsModal from '@/components/boids/BoidsModal'
 
 export default function Home() {
   // const { resetRef, shockwaveRef } = useBoids()
-  const [spinCount, setSpinCount] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const margin = window.innerWidth < 768 ? 20 : 150
   const navigate = useNavigate()
