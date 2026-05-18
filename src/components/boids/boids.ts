@@ -17,7 +17,7 @@ export class Boid {
 
   matchingFactor = 0.016
   centeringFactor = 0.0005
-  avoidFactor = 0.01
+  avoidFactor = 0.015
   turnFactor = 0.14
   maxSpeed = 8.0
   minSpeed = 2.5
