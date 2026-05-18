@@ -60,7 +60,7 @@ export default function Home() {
                 {[
                   { label: 'Dotfiles', img: '/arch.png', alt: 'Arch Linux', desc: 'Arch Linux / Hyprland dotfiles', href: 'https://github.com/brian-brow/dotfiles', to: null },
                   { label: 'Bio', img: '/favicon.png', alt: 'Brian Brown', desc: 'Professional Experience / Education', href: null, to: '/bio' },
-                  { label: 'Feature three', img: null, alt: '', desc: 'Placeholder description goes here', href: null, to: null },
+                  { label: 'Playground', img: null, alt: '', desc: 'Various small simulations and games', href: null, to: '/playground' },
                 ].map((f) => {
                     const card = (
                       <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-gray-600 transition-colors h-full">

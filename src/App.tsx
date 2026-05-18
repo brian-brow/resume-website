@@ -3,6 +3,7 @@ import { BoidsProvider } from '@/components/boids/context/BoidsContext'
 import Layout from '@/components/layout/Layout'
 import Home from '@/pages/Home'
 import Bio from '@/pages/Bio'
+import Playground from '@/pages/Playground'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="bio" element={<Bio />} />
+            <Route path="playground" element={<Playground />} />
           </Route>
         </Routes>
       </BrowserRouter>
