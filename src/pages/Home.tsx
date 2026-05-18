@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import BoidsModal from '@/components/boids/BoidsModal'
-import { useBoids } from '@/components/boids/context/BoidsContext'
+// import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function Home() {
-  const { resetRef, shockwaveRef } = useBoids()
+  // const { resetRef, shockwaveRef } = useBoids()
   const [spinCount, setSpinCount] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const margin = window.innerWidth < 768 ? 20 : 150
@@ -18,38 +18,20 @@ export default function Home() {
     document.documentElement.style.overscrollBehavior = 'none'
   }, [])
 
-  const handleReset = () => {
-    resetRef.current?.()
-    setSpinCount(n => n + 1)
-  }
+  // const handleReset = () => {
+  //   resetRef.current?.()
+  //   setSpinCount(n => n + 1)
+  // }
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
-  }
+  // const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  //   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  //   shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
+  // }
 
   return (
-    <div className="relative min-h-screen text-white overflow-y-auto md:overflow-hidden" onClick={handleCanvasClick}>
+    <div className="relative min-h-screen text-white overflow-y-auto md:overflow-hidden">
       <div className="relative md:absolute md:inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">
-          <button
-            className="absolute top-2 left-2 pointer-events-auto w-8 h-8 text-gray-400 hover:text-white active:scale-90 flex items-center justify-center text-xl leading-none"
-            style={{ transition: 'color 0.2s, transform 0.1s' }}
-            onClick={(e) => { e.stopPropagation(); setModalOpen(true) }}
-            title="About boids"
-          >
-            ⓘ
-          </button>
-          <button
-            className="absolute top-4 right-4 pointer-events-auto w-8 h-8 rounded-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-400 active:scale-90 flex items-center justify-center text-lg"
-            style={{ transition: 'transform 0.3s ease, color 0.2s, border-color 0.2s' }}
-            onClick={(e) => { e.stopPropagation(); handleReset() }}
-            title="Reset boids"
-          >
-            <span style={{ display: 'inline-block', transition: 'transform 0.4s ease', transform: `rotate(${-spinCount * 360}deg)` }}>
-              ↺
-            </span>
-          </button>
           <div className="flex flex-col items-center justify-center h-full px-4 py-4 md:px-0 md:py-0">
             <div className="w-full max-w-2xl">
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800 pointer-events-auto">

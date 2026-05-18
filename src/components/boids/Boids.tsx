@@ -8,14 +8,20 @@ export default function Boids({ resetRef, shockwaveRef }: {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
+
     const margin = window.innerWidth < 768 ? 20 : 150
-    const flock = new Flock(200, canvas.width, canvas.height, margin)
+    const count = window.innerWidth < 768 ? 80 : 200
+    const flock = new Flock(count, canvas.width, canvas.height, margin)
+
     if (resetRef) resetRef.current = () => flock.reset()
     if (shockwaveRef) shockwaveRef.current = (x, y) => flock.addShockwave(x, y)
+
     const resize = () => {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
@@ -23,19 +29,26 @@ export default function Boids({ resetRef, shockwaveRef }: {
       flock.height = canvas.height
     }
     resize()
+
     window.addEventListener('resize', resize)
+
     let animFrameId: number
     let lastTime = performance.now()
+
     const onVisibility = () => {
       if (document.visibilityState === 'visible') {
         lastTime = performance.now()
       }
     }
+
     document.addEventListener('visibilitychange', onVisibility)
+
     const onClick = (e: MouseEvent) => {
       flock.addShockwave(e.offsetX, e.offsetY)
     }
+
     canvas.addEventListener('click', onClick)
+
     const loop = (time: number) => {
       const dt = Math.min(time - lastTime, 10)
       lastTime = time
