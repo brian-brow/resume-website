@@ -16,7 +16,7 @@ export default function Boids({ resetRef, shockwaveRef }: {
     canvas.height = canvas.offsetHeight
 
     const margin = window.innerWidth < 768 ? 20 : 150
-    const count = window.innerWidth < 768 ? 80 : 200
+    const count = window.innerWidth < 768 ? 20 : 200
     const flock = new Flock(count, canvas.width, canvas.height, margin)
 
     if (resetRef) resetRef.current = () => flock.reset()
