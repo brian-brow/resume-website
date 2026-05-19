@@ -3,6 +3,7 @@ export class Boid {
   y: number
   vx: number
   vy: number
+  color: string
 
   // ol reliable
   //
@@ -24,12 +25,13 @@ export class Boid {
   visionRadius = 120
   avoidRadius = 25
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, color: string) {
     const angle = Math.random() * Math.PI * 2
     this.x = x
     this.y = y
     this.vx = Math.cos(angle) * this.minSpeed
     this.vy = Math.sin(angle) * this.minSpeed
+    this.color = color
   }
 
   update(dt: number) {
@@ -49,7 +51,7 @@ export class Boid {
     ctx.lineTo(-size * 0.4, 0)
     ctx.lineTo(-size, -size / 2)
     ctx.closePath()
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = this.color
     ctx.fill()
     ctx.restore()
   }
@@ -104,16 +106,19 @@ export class Flock {
   height: number
   margin: number
   lines: boolean
+  color: string
   shockwaves: Shockwave[] = []
 
-  constructor(count: number, width: number, height: number, margin: number = 150) {
+  constructor(count: number, width: number, height: number, margin: number = 150, color: string = '#ffffff') {
     this.width = width
     this.height = height
     this.margin = margin
     this.lines = false
+    this.color = color ?? '#ffffff'
     this.boids = Array.from({ length: count }, () => new Boid(
       Math.random() * width,
-      Math.random() * height
+      Math.random() * height,
+      this.color
     ))
   }
 
@@ -146,7 +151,7 @@ export class Flock {
           ctx.beginPath()
           ctx.moveTo(boid1.x, boid1.y)
           ctx.lineTo(boid2.x, boid2.y)
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+          ctx.strokeStyle = boid1.color + '30'
           ctx.stroke()
         }
 
@@ -231,7 +236,7 @@ export class Flock {
     this.lines = !this.lines
   }
 
-  updateParams(params: Partial<Pick<Boid, 'matchingFactor' | 'centeringFactor' | 'avoidFactor' | 'turnFactor' | 'maxSpeed' | 'minSpeed' | 'visionRadius' | 'avoidRadius'>>) {
+  updateParams(params: Partial<Pick<Boid, 'matchingFactor' | 'centeringFactor' | 'avoidFactor' | 'turnFactor' | 'maxSpeed' | 'minSpeed' | 'visionRadius' | 'avoidRadius' | 'color'>>) {
     for (const boid of this.boids) {
       Object.assign(boid, params)
     }
@@ -254,7 +259,8 @@ export class Flock {
   reset() {
     this.boids = Array.from({ length: this.boids.length }, () => new Boid(
       Math.random() * this.width,
-      Math.random() * this.height
+      Math.random() * this.height,
+      this.color
     ))
   }
 

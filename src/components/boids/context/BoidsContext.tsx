@@ -6,6 +6,7 @@ interface BoidsContextType {
   linesRef: React.MutableRefObject<(() => void) | null>
   getParamsRef: React.MutableRefObject<(() => any) | null>
   updateParamsRef: React.MutableRefObject<((params: any) => void) | null>
+  setFlockCountRef: React.MutableRefObject<((n: number) => void) | null>
 }
 
 const BoidsContext = createContext<BoidsContextType | null>(null)
@@ -16,9 +17,10 @@ export function BoidsProvider({ children }: { children: React.ReactNode }) {
   const linesRef = useRef<(() => void) | null>(null)
   const getParamsRef = useRef<(() => any) | null>(null)
   const updateParamsRef = useRef<((params: any) => void) | null>(null)
+  const setFlockCountRef = useRef<((n: number) => void) | null>(null)
 
   return (
-    <BoidsContext.Provider value={{ resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef }}>
+    <BoidsContext.Provider value={{ resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef, setFlockCountRef }}>
       {children}
     </BoidsContext.Provider>
   )

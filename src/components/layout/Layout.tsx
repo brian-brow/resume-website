@@ -6,30 +6,30 @@ import BoidsControls from '@/components/boids/BoidsControls'
 import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function Layout() {
-  const { resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef } = useBoids()
+  const boids = useBoids()
   const [spinCount, setSpinCount] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const [controlsOpen, setControlsOpen] = useState(false)
   const margin = window.innerWidth < 768 ? 20 : 150
 
   const handleReset = () => {
-    resetRef.current?.()
+    boids.resetRef.current?.()
     setSpinCount(n => n + 1)
   }
 
   const toggleLines = () => {
-    linesRef.current?.()
+    boids.linesRef.current?.()
   }
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLElement>) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
+    boids.shockwaveRef.current?.(e.clientX - rect.left, e.clientY - rect.top)
   }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white overflow-hidden relative">
       <div className="absolute inset-0">
-        <Boids resetRef={resetRef} shockwaveRef={shockwaveRef} linesRef={linesRef} getParamsRef={getParamsRef} updateParamsRef={updateParamsRef}/>
+        <Boids {...boids} flockCount={1} />
       </div>
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ padding: `${margin}px` }}>
         <div className="relative w-full h-full">

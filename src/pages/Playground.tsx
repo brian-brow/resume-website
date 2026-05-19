@@ -40,6 +40,20 @@ export default function Playground() {
                   </div>
                 </div>
               </a>
+              <a href="/playground/sandsim" target="_blank" rel="noopener noreferrer">
+                <div className="border-gray-600 pl-6 bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800 pointer-events-auto hover:border-gray-600 transition-colors cursor-pointer">
+                  <div className="border-l border-gray-700 pl-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg">Evil Card</h3>
+                      </div>
+                    </div>
+                    <ul className="mt-3 text-gray-400 text-sm space-y-2">
+                      <li>will just flashbang you theres nothing here</li>
+                    </ul>
+                  </div>
+                </div>
+              </a>
             </div>
           </section>
         </div>
