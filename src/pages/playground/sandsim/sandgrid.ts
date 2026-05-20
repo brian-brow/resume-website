@@ -82,13 +82,25 @@ export class SandGrid {
   }
 
   spawn(gridX: number, gridY: number, radius: number): void {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 25; i++) {
       const angle = Math.random() * Math.PI * 2
       const mag   = Math.random() * radius
       const x     = Math.round(gridX + Math.cos(angle) * mag)
       const y     = Math.round(gridY + Math.sin(angle) * mag)
       if (this.inBounds(x, y) && this.get(x, y) === 0) {
         this.set(x, y, [1,2,3][Math.floor(Math.random() * 3)])
+      }
+    }
+  }
+
+  erase(gridX: number, gridY: number, radius: number): void {
+    for (let i = 0; i < 100; i++) {
+      const angle = Math.random() * Math.PI * 2
+      const mag   = Math.random() * radius
+      const x     = Math.round(gridX + Math.cos(angle) * mag)
+      const y     = Math.round(gridY + Math.sin(angle) * mag)
+      if (this.inBounds(x, y) && this.get(x, y) !== 0) {
+        this.set(x, y, 0)
       }
     }
   }

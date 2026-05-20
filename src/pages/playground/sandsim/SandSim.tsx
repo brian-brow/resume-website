@@ -1,29 +1,29 @@
 import { useRef, useEffect, useCallback } from 'react'
-import { SandGrid } from './SandSim/sandsim'
+import { SandGrid } from './sandgrid'
 
 const SCALE = 5
 
 export default function SandSim() {
-  const canvasRef   = useRef<HTMLCanvasElement>(null)
-  const gridRef     = useRef<SandGrid | null>(null)
-  const mousePos    = useRef<{ x: number; y: number } | null>(null)
-  const isPressed   = useRef(false)
+  const canvasRef  = useRef<HTMLCanvasElement>(null)
+  const gridRef    = useRef<SandGrid | null>(null)
+  const mousePos   = useRef<{ x: number; y: number } | null>(null)
+  const isPressed  = useRef<0 | 1 | 2 | null>(null)
 
   const onTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault()
-    const rect = canvasRef.current!.getBoundingClientRect()
+    const rect  = canvasRef.current!.getBoundingClientRect()
     const touch = e.touches[0]
     mousePos.current = { x: touch.clientX - rect.left, y: touch.clientY - rect.top }
   }, [])
 
   const onTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault()
-    isPressed.current = true
+    isPressed.current = 0
   }, [])
 
   const onTouchEnd = useCallback(() => {
-    isPressed.current = false
-    mousePos.current = null
+    isPressed.current = null
+    mousePos.current  = null
   }, [])
 
   useEffect(() => {
@@ -44,12 +44,18 @@ export default function SandSim() {
     let rafId: number
     const loop = () => {
       const grid = gridRef.current!
-      if (isPressed.current && mousePos.current) {
+
+      if (isPressed.current !== null && mousePos.current) {
         const gx     = Math.floor(mousePos.current.x / SCALE)
         const gy     = Math.floor(mousePos.current.y / SCALE)
         const radius = Math.floor(canvas.width * 0.1 / SCALE / 2)
-        grid.spawn(gx, grid.rows - 1 - gy, radius)
+        if (isPressed.current === 0) {
+          grid.spawn(gx, grid.rows - 1 - gy, radius)
+        } else if (isPressed.current === 2) {
+          grid.erase(gx, grid.rows - 1 - gy, radius)
+        }
       }
+
       grid.step()
       grid.render(ctx)
 
@@ -78,8 +84,8 @@ export default function SandSim() {
   }, [])
 
   const onMouseLeave = useCallback(() => {
-    mousePos.current = null
-    isPressed.current = false
+    mousePos.current  = null
+    isPressed.current = null
   }, [])
 
   return (
@@ -87,9 +93,10 @@ export default function SandSim() {
       ref={canvasRef}
       style={{ display: 'block', cursor: 'none', touchAction: 'none' }}
       onMouseMove={onMouseMove}
-      onMouseDown={() => { isPressed.current = true }}
-      onMouseUp={()   => { isPressed.current = false }}
+      onMouseDown={(e) => { isPressed.current = e.button as 0 | 1 | 2 }}
+      onMouseUp={()   => { isPressed.current = null }}
       onMouseLeave={onMouseLeave}
+      onContextMenu={(e) => e.preventDefault()}
       onTouchMove={onTouchMove}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}

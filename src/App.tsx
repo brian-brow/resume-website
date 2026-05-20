@@ -4,7 +4,8 @@ import Layout from '@/components/layout/Layout'
 import Home from '@/pages/Home'
 import Bio from '@/pages/Bio'
 import Playground from '@/pages/Playground'
-import SandSim from '@/pages/playground/SandSim'
+import SandSim from '@/pages/playground/sandsim/SandSim'
+import Sphere from '@/pages/Sphere'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="playground" element={<Playground />} />
           </Route>
           <Route path="/playground/sandsim" element={<SandSim />} />
+          <Route path="sphere" element={<Sphere />} />
         </Routes>
       </BrowserRouter>
     </BoidsProvider>
