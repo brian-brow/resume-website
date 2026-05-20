@@ -45,11 +45,11 @@ export default function Playground() {
                   <div className="border-l border-gray-700 pl-6">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold text-lg">Evil Card</h3>
+                        <h3 className="font-semibold text-lg">Sand Simulation</h3>
                       </div>
                     </div>
                     <ul className="mt-3 text-gray-400 text-sm space-y-2">
-                      <li>will just flashbang you theres nothing here</li>
+                      <li>An old sandsim I wrote a while back, refactored to typescript and fixed a few bugs.</li>
                     </ul>
                   </div>
                 </div>
