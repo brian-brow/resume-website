@@ -1,8 +1,6 @@
-import { useNavigate } from 'react-router-dom'
 // import { useBoids } from '@/components/boids/context/BoidsContext'
 
 export default function SandSim() {
-  const navigate = useNavigate()
 
 
   return (

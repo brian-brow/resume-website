@@ -69,7 +69,7 @@ export default function BoidsControls({ onClose }: { onClose: () => void }) {
             className="text-sm text-gray-500 hover:text-white transition-colors"
             onClick={() => {
               const defaults = Object.fromEntries(PARAMS.filter(p => p.key !== 'numFlocks').map(p => [p.key, p.default]))
-              setValues(prev => ({ ...defaults, numFlocks: prev.numFlocks }))
+              setValues((prev: Record<string, number>) => ({ ...defaults, numFlocks: prev.numFlocks }))
               updateParamsRef.current?.(defaults)
             }}
           >
@@ -82,7 +82,7 @@ export default function BoidsControls({ onClose }: { onClose: () => void }) {
                 p.key,
                 parseFloat((Math.random() * (p.max - p.min) + p.min).toFixed(6))
               ]))
-              setValues(prev => ({ ...random, numFlocks: prev.numFlocks }))
+              setValues((prev: Record<string, number>) => ({ ...random, numFlocks: prev.numFlocks }))
               updateParamsRef.current?.(random)
             }}
           >

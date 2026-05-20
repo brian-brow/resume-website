@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Flock } from './boids'
-export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef, setFlockCountRef, flockCount }: {
+export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, updateParamsRef, setFlockCountRef, flockCount = 1 }: {
   resetRef?: React.MutableRefObject<(() => void) | null>
   shockwaveRef?: React.MutableRefObject<((x: number, y: number) => void) | null>
   linesRef?: React.MutableRefObject<(() => void) | null>
@@ -23,7 +23,7 @@ export default function Boids({ resetRef, shockwaveRef, linesRef, getParamsRef, 
 
     const margin = window.innerWidth < 768 ? 20 : 150
     const count = window.innerWidth < 768 ? 20 : 200
-    const flocks = []
+    const flocks: Flock[] = []
     for (let i = 0; i < flockCount; i++) {
       flocks.push(new Flock(count, canvas.width, canvas.height, margin, flockCount > 1 ? colors[i % colors.length] : '#ffffff'))
     }
