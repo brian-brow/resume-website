@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export default function ThreeScene() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,6 @@ export default function ThreeScene() {
       frameId = requestAnimationFrame(animate);
       sphere.rotation.x += 0.005;
       sphere.rotation.y += 0.01;
-      sphere.x += 1;
       controls.update();
       renderer.render(scene, camera);
     };
