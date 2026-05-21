@@ -1,8 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { Board } from './wfcollapse'
+import { TILE_DATA } from './tileData'
 
 const tileModules = import.meta.glob('./assets/water/*.png', { eager: true })
-const tileImages = Object.values(tileModules).map((mod: any) => mod.default as string)
+const imageMap = Object.fromEntries(
+  Object.entries(tileModules).map(([path, mod]) => [
+    path.split('/').pop()!,
+    (mod as any).default as string
+  ])
+)
+
+const resolvedTileData = TILE_DATA.map(t => ({
+  ...t,
+  image: imageMap[t.filename],
+}))
 
 interface TileGridProps {
   cols: number
@@ -17,11 +28,11 @@ export default function TileGrid({ cols, rows }: TileGridProps) {
   const boardRef = useRef<Board | null>(null)
 
   if (!boardRef.current) {
-    boardRef.current = new Board(rows, cols, tileImages)
+    boardRef.current = new Board(rows, cols, resolvedTileData)
   }
 
   useEffect(() => {
-    boardRef.current = new Board(rows, cols, tileImages)
+    boardRef.current = new Board(rows, cols, resolvedTileData)
     setTick(0)
   }, [rows, cols])
 
@@ -50,7 +61,7 @@ export default function TileGrid({ cols, rows }: TileGridProps) {
     <div
       ref={containerRef}
       onClick={() => {
-        boardRef.current = new Board(rows, cols, tileImages)
+        boardRef.current = new Board(rows, cols, resolvedTileData)
         setTick(0)
       }}
       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}

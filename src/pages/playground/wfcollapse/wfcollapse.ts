@@ -5,14 +5,13 @@ export class Tile {
   left: string
   image: string
 
-  constructor(image: string) {
+  constructor(image: string, top: string, right: string, bottom: string, left: string) {
     this.image = image
-    const filename = image.split('/').pop()!.split('.')[0]
-    this.top = filename.slice(0,3)
-    this.right = filename.slice(3,6)
-    this.bottom = filename.slice(6,9)
-    this.left = filename.slice(9,12)
-    console.log(this.image)
+    this.top = top
+    this.right = right
+    this.bottom = bottom
+    this.left = left
+    console.log(this.top, this.right, this.bottom, this.left)
   }
 
   getTop(): string {
@@ -47,16 +46,16 @@ export class Board {
   rows: number
   cols: number
 
-  constructor(rows: number, cols: number, images: string[]) {
+  constructor(rows: number, cols: number, tileData: { image: string, top: string, right: string, bottom: string, left: string }[]) {
     this.rows = rows
     this.cols = cols
-    this.tiles = images.map(img => new Tile(img))
+    this.tiles = tileData.map(t => new Tile(t.image, t.top, t.right, t.bottom, t.left))
     this.grid = new Array(rows * cols).fill(null)
     this.possibilities = Array.from({ length: rows * cols }, () => [...this.tiles])
 
     const startIndex = Math.floor(Math.random() * this.rows * this.cols)
     const randTile = this.tiles[Math.floor(Math.random() * this.tiles.length)]
-    this.grid[startIndex] = new Tile(randTile.getImage())
+    this.grid[startIndex] = new Tile(randTile.getImage(), randTile.top, randTile.right, randTile.bottom, randTile.left)
     this.possibilities[startIndex] = []
     this.propagate(startIndex)
   }
@@ -105,10 +104,9 @@ export class Board {
 
     const tileIndex = lowestList[Math.floor(Math.random() * lowestList.length)]
     const tile = this.possibilities[tileIndex][Math.floor(Math.random() * this.possibilities[tileIndex].length)]
-    this.grid[tileIndex] = new Tile(tile.getImage())
+    this.grid[tileIndex] = new Tile(tile.getImage(), tile.top, tile.right, tile.bottom, tile.left)
     this.possibilities[tileIndex] = []
     this.propagate(tileIndex)
-
   }
 
   compute(): void {
