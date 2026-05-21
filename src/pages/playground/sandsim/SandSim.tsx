@@ -1,13 +1,16 @@
+import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect, useCallback } from 'react'
 import { SandGrid } from './sandgrid'
 
 const SCALE = 5
 
 export default function SandSim() {
-  const canvasRef  = useRef<HTMLCanvasElement>(null)
-  const gridRef    = useRef<SandGrid | null>(null)
-  const mousePos   = useRef<{ x: number; y: number } | null>(null)
-  const isPressed  = useRef<0 | 1 | 2 | null>(null)
+  const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const gridRef      = useRef<SandGrid | null>(null)
+  const mousePos     = useRef<{ x: number; y: number } | null>(null)
+  const isPressed    = useRef<0 | 1 | 2 | null>(null)
+  const navigate     = useNavigate()
 
   const onTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault()
@@ -27,24 +30,22 @@ export default function SandSim() {
   }, [])
 
   useEffect(() => {
-    const canvas = canvasRef.current!
-    const ctx    = canvas.getContext('2d')!
+    const canvas    = canvasRef.current!
+    const container = containerRef.current!
+    const ctx       = canvas.getContext('2d')!
 
-    canvas.width  = window.innerWidth
-    canvas.height = window.innerHeight
-    gridRef.current = new SandGrid(canvas.width, canvas.height, SCALE)
-
-    const onResize = () => {
-      canvas.width  = window.innerWidth
-      canvas.height = window.innerHeight
+    const resize = () => {
+      canvas.width  = container.clientWidth
+      canvas.height = container.clientHeight
       gridRef.current = new SandGrid(canvas.width, canvas.height, SCALE)
     }
-    window.addEventListener('resize', onResize)
+
+    resize()
+    window.addEventListener('resize', resize)
 
     let rafId: number
     const loop = () => {
       const grid = gridRef.current!
-
       if (isPressed.current !== null && mousePos.current) {
         const gx     = Math.floor(mousePos.current.x / SCALE)
         const gy     = Math.floor(mousePos.current.y / SCALE)
@@ -55,10 +56,8 @@ export default function SandSim() {
           grid.erase(gx, grid.rows - 1 - gy, radius)
         }
       }
-
       grid.step()
       grid.render(ctx)
-
       if (mousePos.current) {
         const r = Math.floor(canvas.width * 0.1 / SCALE) * SCALE / 2
         ctx.strokeStyle = '#fff'
@@ -67,14 +66,13 @@ export default function SandSim() {
         ctx.arc(mousePos.current.x, mousePos.current.y, r, 0, Math.PI * 2)
         ctx.stroke()
       }
-
       rafId = requestAnimationFrame(loop)
     }
-    rafId = requestAnimationFrame(loop)
 
+    rafId = requestAnimationFrame(loop)
     return () => {
       cancelAnimationFrame(rafId)
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', resize)
     }
   }, [])
 
@@ -89,17 +87,27 @@ export default function SandSim() {
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ display: 'block', cursor: 'none', touchAction: 'none' }}
-      onMouseMove={onMouseMove}
-      onMouseDown={(e) => { isPressed.current = e.button as 0 | 1 | 2 }}
-      onMouseUp={()   => { isPressed.current = null }}
-      onMouseLeave={onMouseLeave}
-      onContextMenu={(e) => e.preventDefault()}
-      onTouchMove={onTouchMove}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    />
+    <div className="relative flex h-screen w-screen bg-gray-950 text-white items-center justify-center p-16">
+      <button
+        className="absolute top-4 left-4 text-gray-500 hover:text-white transition-colors text-sm"
+        onClick={() => navigate('/playground')}
+      >
+        ← Back
+      </button>
+      <div ref={containerRef} className="w-full h-full">
+        <canvas
+          ref={canvasRef}
+          style={{ display: 'block', cursor: 'none', touchAction: 'none' }}
+          onMouseMove={onMouseMove}
+          onMouseDown={(e) => { isPressed.current = e.button as 0 | 1 | 2 }}
+          onMouseUp={() => { isPressed.current = null }}
+          onMouseLeave={onMouseLeave}
+          onContextMenu={(e) => e.preventDefault()}
+          onTouchMove={onTouchMove}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        />
+      </div>
+    </div>
   )
 }
