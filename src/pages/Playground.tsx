@@ -4,6 +4,7 @@ const PROJECTS = [
   {
     label: 'Wave Function Collapse',
     desc: 'A procedural generation algorithm that collapses a grid of possibilities into a coherent image, tile by tile, guided by adjacency constraints.',
+    href: null,
     to: '/playground/wfcollapse',
     external: true,
   },
@@ -14,11 +15,13 @@ const SIMULATIONS = [
     label: 'Boids Simulation',
     desc: 'A flocking simulation built with a friend sophomore year. Each boid follows three simple rules — separation, alignment, and cohesion — producing emergent crowd behavior.',
     href: 'https://boid-simulation.web.app/',
+    to: null,
     external: true,
   },
   {
     label: 'Sand Simulation',
     desc: 'A falling-sand simulation where particles interact with each other and their environment. Refactored from an older project into TypeScript.',
+    href: null,
     to: '/playground/sandsim',
     external: true,
   },
