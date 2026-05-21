@@ -18,9 +18,10 @@ const resolvedTileData = TILE_DATA.map(t => ({
 interface TileGridProps {
   cols: number
   rows: number
+  speed: number
 }
 
-export default function TileGrid({ cols, rows }: TileGridProps) {
+export default function TileGrid({ cols, rows, speed }: TileGridProps) {
   const [_, setTick] = useState(0)
   const [availableWidth, setAvailableWidth] = useState(0)
   const [availableHeight, setAvailableHeight] = useState(0)
@@ -40,9 +41,9 @@ export default function TileGrid({ cols, rows }: TileGridProps) {
     const interval = setInterval(() => {
       boardRef.current!.step()
       setTick(t => t + 1)
-    }, 15)
+    }, speed)
     return () => clearInterval(interval)
-  }, [])
+  }, [speed])
 
   useEffect(() => {
     const ro = new ResizeObserver(([entry]) => {
@@ -54,7 +55,7 @@ export default function TileGrid({ cols, rows }: TileGridProps) {
   }, [])
 
   const images = boardRef.current.getGridImages()
-  const total = cols * rows
+  const total = boardRef.current.grid.length
   const cellSize = Math.floor(Math.min(availableWidth / cols, availableHeight / rows))
 
   return (
@@ -72,8 +73,12 @@ export default function TileGrid({ cols, rows }: TileGridProps) {
         gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
       }}>
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} style={{ overflow: 'hidden' }}>
-            <img src={images[i]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div key={i} style={{ overflow: 'hidden' }} className={images[i] ? '' : 'border border-gray-800'}>
+            {images[i]
+              ? <img src={images[i]!} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <div className="w-full h-full flex items-center justify-center text-m text-gray-200">
+                {boardRef.current!.getPossibilities()[i].length}
+              </div>}
           </div>
         ))}
       </div>

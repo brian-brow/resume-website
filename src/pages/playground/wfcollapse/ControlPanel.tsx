@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom'
 interface ControlPanelProps {
   cols: number
   rows: number
+  speed: number
   setCols: (n: number) => void
   setRows: (n: number) => void
+  setSpeed: (n: number) => void
 }
 
-export default function ControlPanel({ cols, rows, setCols, setRows }: ControlPanelProps) {
+export default function ControlPanel({ cols, rows, speed, setCols, setRows, setSpeed }: ControlPanelProps) {
   const navigate = useNavigate()
 
   return (
@@ -41,9 +43,20 @@ export default function ControlPanel({ cols, rows, setCols, setRows }: ControlPa
           className="w-full accent-white"
         />
       </div>
+      <div>
+        <div className="flex justify-between text-sm mb-1">
+          <span className="text-gray-300">Speed</span>
+          <span className="text-gray-500">{speed}ms</span>
+        </div>
+        <input
+          type="range" min={1} max={100} value={speed}
+          onChange={e => setSpeed(Number(e.target.value))}
+          className="w-full accent-white"
+        />
+      </div>
       <button
         className="mt-2 text-sm text-gray-500 hover:text-white transition-colors text-left"
-        onClick={() => { setCols(10); setRows(10) }}
+        onClick={() => { setCols(10); setRows(10); setSpeed(25) }}
       >
         Reset Grid
       </button>
