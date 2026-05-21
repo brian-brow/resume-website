@@ -12,6 +12,7 @@ export class Tile {
     this.right = filename.slice(3,6)
     this.bottom = filename.slice(6,9)
     this.left = filename.slice(9,12)
+    console.log(this.image)
   }
 
   getTop(): string {
