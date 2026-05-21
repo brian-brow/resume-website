@@ -7,7 +7,7 @@ export class Tile {
 
   constructor(image: string) {
     this.image = image
-    const filename = image.split('/').pop()!.replace('.png', '')
+    const filename = image.split('/').pop()!.split('.')[0]
     this.top = filename.slice(0,3)
     this.right = filename.slice(3,6)
     this.bottom = filename.slice(6,9)
