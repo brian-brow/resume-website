@@ -11,7 +11,6 @@ export class Tile {
     this.right = right
     this.bottom = bottom
     this.left = left
-    console.log(this.top, this.right, this.bottom, this.left)
   }
 
   getTop(): string {
