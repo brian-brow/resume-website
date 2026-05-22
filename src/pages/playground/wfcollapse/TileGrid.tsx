@@ -65,7 +65,8 @@ export default function TileGrid({ cols, rows, speed }: TileGridProps) {
         boardRef.current = new Board(rows, cols, resolvedTileData)
         setTick(0)
       }}
-      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}
+      className="pt-12"
     >
       <div style={{
         display: 'grid',
