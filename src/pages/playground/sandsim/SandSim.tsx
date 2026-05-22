@@ -88,12 +88,6 @@ export default function SandSim() {
 
   return (
     <div className="relative flex h-screen w-screen bg-gray-950 text-white items-center justify-center p-16 pt-12">
-      <button
-        className="absolute top-4 left-4 text-gray-500 hover:text-white transition-colors text-sm"
-        onClick={() => navigate('/playground')}
-      >
-        ← Back
-      </button>
       <div ref={containerRef} className="w-full h-full">
         <canvas
           ref={canvasRef}

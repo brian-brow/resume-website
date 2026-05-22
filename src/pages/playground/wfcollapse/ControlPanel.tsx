@@ -14,12 +14,6 @@ export default function ControlPanel({ cols, rows, speed, setCols, setRows, setS
 
   return (
     <div className="bg-gray-900/80 backdrop-blur-sm border-r border-gray-700 p-8 w-64 flex flex-col gap-4">
-      <button
-        className="text-gray-500 hover:text-white transition-colors text-sm text-left"
-        onClick={() => navigate('/playground')}
-      >
-        ← Back
-      </button>
       <h2 className="text-xl font-bold">Controls</h2>
       <div>
         <div className="flex justify-between text-sm mb-1">
