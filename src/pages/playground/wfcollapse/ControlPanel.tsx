@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom'
-
 interface ControlPanelProps {
   cols: number
   rows: number
@@ -10,7 +8,6 @@ interface ControlPanelProps {
 }
 
 export default function ControlPanel({ cols, rows, speed, setCols, setRows, setSpeed }: ControlPanelProps) {
-  const navigate = useNavigate()
 
   return (
     <div className="bg-gray-900/80 backdrop-blur-sm border-r border-gray-700 p-8 w-64 flex flex-col gap-4">

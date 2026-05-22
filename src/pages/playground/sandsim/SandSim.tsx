@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { useRef, useEffect, useCallback } from 'react'
 import { SandGrid } from './sandgrid'
 
@@ -10,7 +9,6 @@ export default function SandSim() {
   const gridRef      = useRef<SandGrid | null>(null)
   const mousePos     = useRef<{ x: number; y: number } | null>(null)
   const isPressed    = useRef<0 | 1 | 2 | null>(null)
-  const navigate     = useNavigate()
 
   const onTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault()
