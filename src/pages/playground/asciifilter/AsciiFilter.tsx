@@ -71,7 +71,9 @@ export default function MyVideo() {
     const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height)
     const { data, width, height } = imageData
 
-    const chars = '.\'^"`,:;Il!i><~+_-?][}{1)(|/\\tjfrxnuvczXYUJCQLO0ZmwqpdbkhaoM#W&%B@$'.split('')
+    // const chars = '.\'^"`,:;Il!i><~+_-?][}{1)(|/\\tjfrxnuvczXYUJCQLO0ZmwqpdbkhaoM#W&%B@$'.split('')
+    // const chars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@']
+    const chars = [' ', '.', ',', ':', ';', '-', '=', '+', '*', '?', 'o', 'a', '#', 'W', 'M', '@', '$', '%', '&', '8']
     const cols = Math.floor(width / cellSize)
     const rows = Math.floor(height / cellSize)
 
