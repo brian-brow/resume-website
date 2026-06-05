@@ -6,7 +6,12 @@ const PROJECTS = [
     desc: 'A procedural generation algorithm that collapses a grid of possibilities into a coherent image, tile by tile, guided by adjacency constraints.',
     href: null,
     to: '/playground/wfcollapse',
-    external: true,
+  },
+  {
+    label: 'ASCII Webcam Filter',
+    desc: 'A filter that takes your webcam output and renders it as purely ascii characters. Simple right now, possibly more to come. This was an experiment in using webcams and manipulating their output.',
+    href: null,
+    to: '/playground/asciifilter',
   },
 ]
 
