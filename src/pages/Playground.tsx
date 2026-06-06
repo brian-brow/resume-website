@@ -13,6 +13,12 @@ const PROJECTS = [
     href: null,
     to: '/playground/asciifilter',
   },
+  {
+    label: 'Connect Four',
+    desc: 'A fully functioning connect four game that uses the minmax algorithm to play against you. Its depth is not very deep so its not too hard to beat.',
+    href: null,
+    to: '/playground/connectfour',
+  },
 ]
 
 const SIMULATIONS = [

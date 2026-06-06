@@ -7,6 +7,7 @@ import Playground from '@/pages/Playground'
 import SandSim from '@/pages/playground/sandsim/SandSim'
 import WFCollapse from '@/pages/playground/wfcollapse/WFCollapse'
 import AsciiFilter from '@/pages/playground/asciifilter/AsciiFilter'
+import ConnectFour from '@/pages/playground/connectfour/ConnectFour'
 import Sphere from '@/pages/Sphere'
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/playground/wfcollapse" element={<WFCollapse />} />
         <Route path="sphere" element={<Sphere />} />
         <Route path="/playground/asciifilter" element={<AsciiFilter />} />
+        <Route path="/playground/connectfour" element={<ConnectFour />} />
       </Routes>
     </BoidsProvider>
   )
