@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom'
 
 const PROJECTS = [
   {
-    label: 'Wave Function Collapse',
-    desc: 'A procedural generation algorithm that collapses a grid of possibilities into a coherent image, tile by tile, guided by adjacency constraints.',
+    label: 'Connect Four',
+    desc: 'A fully functioning connect four game that uses the minmax algorithm to play against you. Its depth is not very deep so its not too hard to beat.',
     href: null,
-    to: '/playground/wfcollapse',
+    to: '/playground/connectfour',
   },
   {
     label: 'ASCII Webcam Filter',
@@ -14,10 +14,10 @@ const PROJECTS = [
     to: '/playground/asciifilter',
   },
   {
-    label: 'Connect Four',
-    desc: 'A fully functioning connect four game that uses the minmax algorithm to play against you. Its depth is not very deep so its not too hard to beat.',
+    label: 'Wave Function Collapse',
+    desc: 'A procedural generation algorithm that collapses a grid of possibilities into a coherent image, tile by tile, guided by adjacency constraints.',
     href: null,
-    to: '/playground/connectfour',
+    to: '/playground/wfcollapse',
   },
 ]
 
