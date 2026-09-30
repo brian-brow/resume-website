@@ -1,0 +1,527 @@
+:root {
+  --ink: #1c1c1c;
+  --paper: #ffffff;
+  --stone: #ecebe6;
+  --line-dark: #3a3a3a;
+  --accent: #ff5a1f;
+  --lily: #d6d6d2; /* the pond's FLAT grey, engine.ts */
+  --sans: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+  --ease-zoom: cubic-bezier(0.7, 0, 0.2, 1);
+  --pad: clamp(18px, 2.3vw, 32px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ink);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+}
+
+.label {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------- stage + layers ---------- */
+
+/*
+ * One movement: home zooms into the door while the menu, which starts shrunk
+ * to fit inside the door, zooms out to full size in lockstep. The doors ride on
+ * the menu, so they always cover exactly the door and part as it grows.
+ *
+ * App.tsx measures the orange door and sets --zoom-x, --zoom-y, --zoom-s so
+ * the zoom lands with the door covering the screen. The menu's start is the
+ * inverse of that. Both are translate-then-scale so they interpolate in step.
+ */
+
+.stage {
+  --t-zoom: 900ms;
+  --t-text: 150ms;
+
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--ink);
+  transform-origin: 0 0;
+  transition: transform var(--t-zoom) var(--ease-zoom);
+}
+
+.is-open .layer-home {
+  transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom-s));
+}
+
+/* the box's text fades before the menu appears over it, and back after it leaves */
+.door > * {
+  transition: opacity var(--t-text) ease calc(var(--t-zoom) - var(--t-text));
+}
+
+.is-open .door > * {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* inside: on top, shrunk into the door while closed */
+
+.layer-inside {
+  z-index: 1;
+  visibility: hidden;
+  transform: translate(calc(var(--zoom-x) / var(--zoom-s) * -1), calc(var(--zoom-y) / var(--zoom-s) * -1))
+    scale(calc(1 / var(--zoom-s)));
+  transition:
+    transform var(--t-zoom) var(--ease-zoom),
+    visibility 0s linear calc(var(--t-zoom) - var(--t-text));
+}
+
+.is-open .layer-inside {
+  visibility: visible;
+  transform: translate(0, 0) scale(1);
+  transition-delay: 0s, var(--t-text);
+}
+
+/* doors: two orange halves covering the menu, parting as it grows */
+
+.doors {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: var(--accent);
+  transition: transform calc(var(--t-zoom) - var(--t-text)) var(--ease-zoom);
+}
+
+.panel-left {
+  left: 0;
+}
+
+.panel-right {
+  right: 0;
+}
+
+.is-open .panel {
+  transition-delay: var(--t-text);
+}
+
+.is-open .panel-left {
+  transform: translateX(-100%);
+}
+
+.is-open .panel-right {
+  transform: translateX(100%);
+}
+
+/* ---------- top bar ---------- */
+
+.bar {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  gap: 1px;
+}
+
+.bar-mark {
+  width: 56px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.bar-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px;
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bar-action {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: var(--paper);
+  font-size: 15px;
+}
+
+.bar-action-dark {
+  justify-content: space-between;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.bar-action-dark:focus-visible {
+  outline-color: var(--paper);
+}
+
+/* ---------- grid + cells ---------- */
+
+.grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.cell {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  padding: 28px var(--pad) 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.pond-window {
+  padding: 0;
+}
+
+.room.pond-window {
+  padding: 28px var(--pad) 26px;
+}
+
+.pond-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.pond-window > :not(canvas) {
+  position: relative;
+}
+
+/* home */
+
+.name {
+  margin: 0;
+  font-size: clamp(88px, 12.8vw, 184px);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.82;
+}
+
+.door {
+  background: var(--accent);
+}
+
+.door-line {
+  max-width: 520px;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.door-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.door-arrow {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.door:hover .door-arrow,
+.door:focus-visible .door-arrow {
+  transform: translate(6px, -6px);
+}
+
+/* inside */
+
+.bio {
+  margin: 0;
+  max-width: 600px;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+
+.room-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.room-links {
+  background: var(--ink);
+  color: #f4f4f1;
+  border-left: 1px solid var(--line-dark);
+}
+
+.room-links :focus-visible {
+  outline-color: var(--paper);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.rows-ink {
+  border-bottom-color: var(--ink);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-dark);
+  font-size: clamp(20px, 1.9vw, 28px);
+  letter-spacing: -0.01em;
+}
+
+.rows-ink .row {
+  border-top-color: var(--ink);
+  font-size: clamp(18px, 1.7vw, 24px);
+}
+
+.row-link {
+  justify-content: space-between;
+}
+
+.row-post {
+  gap: 28px;
+}
+
+.post-date {
+  width: 96px;
+  flex-shrink: 0;
+}
+
+.room-writing {
+  background: var(--stone);
+}
+
+.chip {
+  align-self: flex-start;
+  background: var(--paper);
+  padding: 6px 10px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  background: var(--paper);
+  font-size: clamp(18px, 1.7vw, 24px);
+  letter-spacing: -0.01em;
+}
+
+/* the lily pad in the Play room that opens the projects screen */
+
+.room-play .lily {
+  position: absolute;
+  top: 22%;
+  right: 16%;
+  width: clamp(96px, 9vw, 132px);
+  aspect-ratio: 1.25;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--lily);
+  transition: transform 0.3s ease;
+}
+
+.lily:hover,
+.lily:focus-visible {
+  transform: scale(1.06);
+}
+
+/* play: on top of the menu; ripples out of the lily pad at /play, back into it on the way out */
+
+.layer-play {
+  z-index: 2;
+  visibility: hidden;
+  clip-path: circle(0 at var(--lily-x) var(--lily-y));
+  transition:
+    clip-path var(--t-zoom) var(--ease-zoom),
+    visibility 0s linear var(--t-zoom);
+}
+
+.is-play .layer-play {
+  visibility: visible;
+  /* radius reaches the farthest screen corner */
+  clip-path: circle(
+    max(
+      hypot(var(--lily-x), var(--lily-y)),
+      hypot(100vw - var(--lily-x), var(--lily-y)),
+      hypot(var(--lily-x), 100dvh - var(--lily-y)),
+      hypot(100vw - var(--lily-x), 100dvh - var(--lily-y))
+    )
+    at var(--lily-x) var(--lily-y)
+  );
+  transition-delay: 0s;
+}
+
+.play-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.play-stage {
+  grid-row: span 2;
+}
+
+.play-list {
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+
+.row[aria-current="page"] > :first-child::before {
+  content: "→ ";
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 760px) {
+  .bar-status,
+  .cell-pond-secondary {
+    display: none;
+  }
+
+  .bar-action {
+    width: auto;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(160px, 1fr) auto;
+  }
+
+  .cell-name,
+  .door {
+    min-height: 34dvh;
+  }
+
+  .layer-inside {
+    overflow-y: auto;
+  }
+
+  .layer-inside .grid {
+    flex: none;
+    grid-template-rows: none;
+    grid-auto-rows: minmax(60dvh, auto);
+  }
+
+  .room-links {
+    border-left: 0;
+  }
+
+  .layer-play {
+    overflow-y: auto;
+  }
+
+  .play-grid {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(60dvh, auto) minmax(160px, 40dvh) auto;
+  }
+
+  .play-stage {
+    grid-row: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .door > *,
+  .panel,
+  .door-arrow,
+  .lily {
+    transition: none !important;
+  }
+}
