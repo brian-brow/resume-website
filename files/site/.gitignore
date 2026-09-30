@@ -1,6 +1,0 @@
-node_modules
-dist
-.vercel
-.env*
-crates/pond/target
-crates/pond/pkg
