@@ -1,10 +1,10 @@
 :root {
-  --ink: #1c1c1c;
-  --paper: #ffffff;
-  --stone: #ecebe6;
-  --line-dark: #3a3a3a;
-  --accent: #7A306C;
-  --lily: #d6d6d2; /* the pond's FLAT grey, engine.ts */
+  --ink: #dbfe87;
+  --paper: #394053;
+  --stone: #4e4a59;
+  --line-dark: #6e6362;
+  --accent: #7cae7a;
+  --lily: #839073; /* the pond's FLAT, engine.ts */
   --sans: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
   --ease-zoom: cubic-bezier(0.7, 0, 0.2, 1);
@@ -179,7 +179,7 @@ button {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: var(--ink);
+  background: var(--accent);
   color: var(--paper);
   font-family: var(--mono);
   font-size: 14px;
@@ -268,6 +268,10 @@ button {
 
 /* home */
 
+.cell-name {
+  background: var(--lily);
+}
+
 .name {
   margin: 0;
   font-size: clamp(88px, 12.8vw, 184px);
@@ -278,6 +282,7 @@ button {
 
 .door {
   background: var(--accent);
+  color: var(--paper);
 }
 
 .door-line {
@@ -321,8 +326,8 @@ button {
 }
 
 .room-links {
-  background: var(--ink);
-  color: #f4f4f1;
+  background: var(--accent);
+  color: var(--paper);
   border-left: 1px solid var(--line-dark);
 }
 
@@ -394,6 +399,10 @@ button {
   background: var(--paper);
   font-size: clamp(18px, 1.7vw, 24px);
   letter-spacing: -0.01em;
+}
+
+.card:nth-child(even) {
+  background: var(--stone);
 }
 
 /* the lily pad in the Play room that opens the projects screen */

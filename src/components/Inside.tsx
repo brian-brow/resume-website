@@ -14,7 +14,7 @@ interface InsideProps {
 }
 
 const links = [
-  { label: "GitHub", detail: "@[HANDLE]", href: "#" },
+  { label: "GitHub", detail: "brian-brow", href: "https://github.com/brian-brow" },
   { label: "X / Twitter", detail: "@[HANDLE]", href: "#" },
   { label: "LinkedIn", detail: "[NAME]", href: "#" },
   { label: "Email", detail: "[YOU@DOMAIN]", href: "#" },

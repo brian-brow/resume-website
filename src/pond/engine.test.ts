@@ -21,13 +21,13 @@ describe("Pond", () => {
     }
   });
 
-  test("render is strictly 1-bit plus the flat shape colour", () => {
+  test("render is a 1-bit dither plus flat shape and fish colours", () => {
     const pond = new Pond(480, 300, { random: seeded(2) });
     pond.step(1, 1 / 30);
     const buf = new Uint32Array(240 * 150);
     pond.render(buf, { sx: 120, sy: 60, sw: 240, sh: 150 });
     const colours = new Set(buf);
-    expect(colours.size).toBeLessThanOrEqual(3);
+    expect(colours.size).toBeLessThanOrEqual(5);
     expect(colours.has(0)).toBe(false); // every pixel written
   });
 

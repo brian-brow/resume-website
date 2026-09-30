@@ -30,9 +30,11 @@ export interface PondCore {
 }
 
 // Colours as little-endian ABGR for Uint32 views over ImageData
-const INK = 0xff1c1c1c;
-const PAPER = 0xffffffff;
-const FLAT = 0xffd2d6d6;
+const INK = 0xff87fedb;
+const PAPER = 0xff534039;
+const FLAT = 0xff739083;
+const ARC = 0xff7aae7c;
+const FISH = 0xff62636e;
 
 // Light direction for slope shading
 const LX = 0.6;
@@ -219,7 +221,7 @@ export class Pond implements PondCore {
 
         const ad = arcDist[f] + arcSway;
         if (Math.abs(ad - arcR1) < 5.5 || Math.abs(ad - arcR2) < 2) {
-          buf[o] = FLAT;
+          buf[o] = ARC;
           continue;
         }
 
@@ -407,7 +409,7 @@ export class Pond implements PondCore {
           const body = (u / 4.6) ** 2 + (v / 1.7) ** 2;
           const tail = u < -3.6 && u > -7.4 && Math.abs(v) < (-u - 3.6) * 0.7 + 0.4;
           const idx = j * crop.sw + i;
-          if (body < 1 || tail) buf[idx] = INK;
+          if (body < 1 || tail) buf[idx] = FISH;
           else if (body < 1.9 || (u < -3 && u > -8.4 && Math.abs(v) < (-u - 3) * 0.7 + 1.4)) buf[idx] = PAPER;
         }
       }
