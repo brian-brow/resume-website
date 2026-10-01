@@ -1,9 +1,10 @@
-import { forwardRef, type RefObject } from "react";
+import { forwardRef, useState, type MouseEvent, type RefObject } from "react";
 import { Link } from "../lib/router";
 import { PondWindow, usePondPad } from "../pond/react";
 import { ArrowLeft } from "./icons";
 import { projects } from "./Play";
 import { useClock } from "./useClock";
+import { posts } from "./Writing";
 
 interface InsideProps {
   open: boolean;
@@ -15,39 +16,48 @@ interface InsideProps {
 
 const links = [
   { label: "GitHub", detail: "brian-brow", href: "https://github.com/brian-brow" },
-  { label: "X / Twitter", detail: "@[HANDLE]", href: "#" },
-  { label: "LinkedIn", detail: "[NAME]", href: "#" },
-  { label: "Email", detail: "[YOU@DOMAIN]", href: "#" },
+  { label: "X / Twitter", detail: "secret", href: "#" },
+  { label: "LinkedIn", detail: "in/brian-brown", href: "https://www.linkedin.com/in/brian-brown-5a7aa2298/" },
+  { label: "Email", detail: "brianbrown13378@gmail.com", href: "mailto:brianbrown13378@gmail.com" },
 ];
 
-const posts = [
-  { date: "[DATE]", title: "[Most recent post title]", href: "#" },
-  { date: "[DATE]", title: "[Older post title]", href: "#" },
-  { date: "[DATE]", title: "[Oldest post title]", href: "#" },
-];
+const isMail = (href: string) => href.startsWith("mailto:");
 
 /** The four rooms behind the door. */
 export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside({ open, pondActive, onLeave, padRef, onBrowse }, backRef) {
   const time = useClock();
   usePondPad(padRef);
+  const [copied, setCopied] = useState(false);
+
+  /** Copies the address instead of opening a mail app; falls back to the mailto link if the clipboard is blocked. */
+  const copy = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(href.slice("mailto:".length)).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      },
+      () => (location.href = href),
+    );
+  };
+
   return (
     <div className="layer layer-inside" data-pond-layer inert={!open}>
       <header className="bar">
         <div className="bar-mark">BB</div>
         <button ref={backRef} type="button" className="bar-action" onClick={onLeave}>
           <ArrowLeft />
-          <span>Back to index</span>
+          <span>Back</span>
         </button>
         <div className="bar-meta">
-          <span>Index / Inside</span>
-          <span>{time} · [Your city]</span>
+          <span>{time}</span>
         </div>
       </header>
 
       <main className="grid">
         <section className="cell room room-bio" aria-labelledby="bio-h">
           <h2 id="bio-h" className="label">01 — Bio</h2>
-          <p className="bio">Software Engineer at the Loxahatchee River District.</p>
+          <p className="bio">Computer science graduate from the University of Florida.</p>
           <div className="room-foot label">
             <span>Based in South Florida</span>
             <span>Software Engineer / University of Florida</span>
@@ -58,9 +68,11 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
           <h2 id="links-h" className="label">02 — Links</h2>
           <nav className="rows">
             {links.map((l) => (
-              <a key={l.label} className="row row-link" href={l.href}>
+              <a key={l.label} className="row row-link" href={l.href} onClick={isMail(l.href) ? (e) => copy(e, l.href) : undefined}>
                 <span>{l.label}</span>
-                <span className="label">{l.detail} ↗</span>
+                <span className="label" aria-live="polite">
+                  {copied && isMail(l.href) ? "Copied" : l.detail} ↗
+                </span>
               </a>
             ))}
           </nav>
@@ -84,14 +96,14 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
         <section className="cell room room-writing" aria-labelledby="writing-h">
           <h2 id="writing-h" className="label">04 — Writing</h2>
           <div className="rows rows-ink">
-            {posts.map((p, i) => (
-              <a key={i} className="row row-post" href={p.href}>
+            {posts.slice(0, 3).map((p) => (
+              <Link key={p.slug} className="row row-post" href={`/writing/${p.slug}`}>
                 <span className="label post-date">{p.date}</span>
                 <span>{p.title}</span>
-              </a>
+              </Link>
             ))}
           </div>
-          <a className="label" href="#">All posts →</a>
+          <Link className="label" href="/writing">All posts →</Link>
         </section>
       </main>
 

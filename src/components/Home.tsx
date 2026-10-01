@@ -17,18 +17,18 @@ export const Home = forwardRef<HTMLButtonElement, HomeProps>(function Home({ ope
       <header className="bar">
         <div className="bar-mark">BB</div>
         <div className="bar-meta">
-          <span>{time} · [Your city]</span>
-          <span className="bar-status">Currently — [building / reading / playing something]</span>
+          <span>{time}</span>
+          <span className="bar-status">Currently — Fixing my quickshell config</span>
         </div>
         <button type="button" className="bar-action bar-action-dark" onClick={onEnter}>
-          <span>Step inside</span>
+          <span>Hello</span>
           <ArrowRight />
         </button>
       </header>
 
       <main className="grid">
         <section className="cell cell-name">
-          <p className="label">Personal site / Index</p>
+          <p className="label"></p>
           <h1 className="name">
             Brian
             <br />
@@ -40,9 +40,9 @@ export const Home = forwardRef<HTMLButtonElement, HomeProps>(function Home({ ope
         <PondWindow className="cell cell-pond-secondary" active={pondActive} />
 
         <button ref={doorRef} type="button" className="cell door" onClick={onEnter} aria-label="Open the menu">
-          <span className="door-line">[One line on who you are — e.g. engineer, tinkerer, occasional writer.]</span>
+          <span className="door-line">Linux Enthusiast.</span>
           <span className="door-foot">
-            <span className="label">Bio · Links · Play · Writing</span>
+            {/* <span className="label">Bio · Links · Play · Writing</span> */}
             <span className="door-arrow">
               <ArrowUpRight />
             </span>

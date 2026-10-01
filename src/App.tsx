@@ -2,38 +2,39 @@ import { useEffect, useRef, useState } from "react";
 import { Home } from "./components/Home";
 import { Inside } from "./components/Inside";
 import { Play } from "./components/Play";
+import { Writing } from "./components/Writing";
 import { go, up, usePath } from "./lib/router";
 import { offsetInLayer, usePondStage } from "./pond/react";
 
 const isPlay = (path: string) => /^\/play(\/|$)/.test(path);
+const isWriting = (path: string) => /^\/writing(\/|$)/.test(path);
 
 export default function App() {
   const path = usePath();
   const play = isPlay(path);
-  // The menu stays zoomed in underneath the projects screen
-  const open = path === "/menu" || play;
+  const writing = isWriting(path);
+  // The menu stays zoomed in underneath the projects and posts screens
+  const open = path === "/menu" || play || writing;
   const [moving, setMoving] = useState(false);
   const stageRef = usePondStage<HTMLDivElement>();
   const doorRef = useRef<HTMLButtonElement>(null);
   const backRef = useRef<HTMLButtonElement>(null);
   const playRef = useRef<HTMLButtonElement>(null);
+  const writingRef = useRef<HTMLButtonElement>(null);
   const lilyRef = useRef<HTMLButtonElement>(null);
   const firstRender = useRef(true);
 
-  // Keeps the zoom aimed at the door and the ripple centred on the lily pad; set ahead of time so each transition has a start
+  // Keeps the zoom aimed at the door
   useEffect(() => {
     const stage = stageRef.current;
     const door = doorRef.current;
-    const lily = lilyRef.current;
-    const menu = lily?.closest<HTMLElement>("[data-pond-layer]");
-    if (!stage || !door || !lily || !menu) return;
+
+    if (!stage || !door) return;
+
     const measure = () => {
-      const { left, top } = offsetInLayer(lily);
-      stage.style.setProperty("--lily-x", `${left + lily.offsetWidth / 2 - menu.scrollLeft}px`);
-      stage.style.setProperty("--lily-y", `${top + lily.offsetHeight / 2 - menu.scrollTop}px`);
       const W = stage.clientWidth;
       const H = stage.clientHeight;
-      // offsets, not rects: they ignore the home layer's zoom transform
+
       const { offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h } = door;
       const s = Math.max(W / w, H / h);
       stage.style.setProperty("--zoom-s", String(s));
@@ -43,6 +44,22 @@ export default function App() {
     const ro = new ResizeObserver(measure);
     ro.observe(stage);
     ro.observe(door);
+    return () => ro.disconnect();
+  }, [stageRef]);
+
+  // Keeps the ripple centred on the lily pad
+  useEffect(() => {
+    const stage = stageRef.current;
+    const lily = lilyRef.current;
+    const menu = lily?.closest<HTMLElement>("[data-pond-layer]");
+    if (!stage || !lily || !menu) return;
+    const measure = () => {
+      const { left, top } = offsetInLayer(lily);
+      stage.style.setProperty("--lily-x", `${left + lily.offsetWidth / 2 - menu.scrollLeft}px`);
+      stage.style.setProperty("--lily-y", `${top + lily.offsetHeight / 2 - menu.scrollTop}px`);
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
     menu.addEventListener("scroll", measure, { passive: true });
     return () => {
       ro.disconnect();
@@ -62,32 +79,33 @@ export default function App() {
     const ms = parseFloat(getComputedStyle(stage).getPropertyValue("--t-zoom"));
     const id = setTimeout(() => {
       setMoving(false);
-      (play ? playRef : open ? backRef : doorRef).current?.focus({ preventScroll: true });
+      (play ? playRef : writing ? writingRef : open ? backRef : doorRef).current?.focus({ preventScroll: true });
     }, ms);
     return () => clearTimeout(id);
-  }, [open, play, stageRef]);
+  }, [open, play, writing, stageRef]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (isPlay(location.pathname)) up("/menu");
+      if (isPlay(location.pathname) || isWriting(location.pathname)) up("/menu");
       else if (location.pathname === "/menu") up("/");
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const className = ["stage", open && "is-open", play && "is-play"].filter(Boolean).join(" ");
+  const className = ["stage", open && "is-open", play && "is-play", writing && "is-writing"].filter(Boolean).join(" ");
 
   return (
     <div ref={stageRef} className={className}>
       <Home ref={doorRef} open={open} pondActive={!open || moving} onEnter={() => go("/menu")} />
-      <Inside ref={backRef} open={open && !play} pondActive={(open && !play) || moving}
+      <Inside ref={backRef} open={open && !play && !writing} pondActive={(open && !play && !writing) || moving}
         onLeave={() => up("/")}
         padRef={lilyRef}
         onBrowse={() => go("/play")}
       />
       <Play ref={playRef} open={play} slug={path.split("/")[2]} />
+      <Writing ref={writingRef} open={writing} slug={path.split("/")[2]} />
     </div>
   );
 }

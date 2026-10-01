@@ -13,7 +13,7 @@ dithered pond, and an accent-coloured door that zooms into a four-room menu
 | Simulations | Rust → WebAssembly | Pixel-heavy work (water, dither, boids) and a Rust learning project |
 | API | Hono on Vercel Functions (Bun runtime) | Tiny, TS-first, end-to-end typed client for React |
 | Hosting | Vercel | Static frontend + functions from one repo |
-| CI/CD | GitHub Actions | Checks every PR; deploys via the Vercel CLI once enabled |
+| CI/CD | GitHub Actions + Vercel | Actions checks every PR; Vercel deploys from Git |
 
 ### Roadmap
 
@@ -30,13 +30,16 @@ dithered pond, and an accent-coloured door that zooms into a four-room menu
 ```
 ├── src/
 │   ├── App.tsx              # layer state, zoom, focus, Escape to go back
-│   ├── components/          # Home (index), Inside (four rooms), clock, icons
+│   ├── components/          # Home (index), Inside (four rooms), Play, Writing, clock, icons
+│   ├── play/                # projects shown at /play: connectfour, sandsim, wfcollapse (ported from main)
+│   ├── posts/               # one plain-text post per YYYY-MM-DD-slug.md; first paragraph is the title
 │   ├── pond/
 │   │   ├── engine.ts        # the simulation: water + dither + boids (PondCore)
 │   │   ├── engine.test.ts   # bun test
 │   │   ├── loop.ts          # animation loop, paints each window's crop
 │   │   └── react.tsx        # <PondProvider>, <PondWindow>, usePondStage
 │   ├── lib/api.ts           # typed Hono client
+│   ├── lib/posts.ts         # parses src/posts into the post list
 │   └── styles.css
 ├── api/
 │   ├── index.ts             # Hono app → one Vercel Function
@@ -112,29 +115,11 @@ export const wasmCore: PondCore = {
 (For true zero-copy, point the canvas `ImageData` at wasm memory directly
 instead of `buf.set`; this version is simpler to start with.)
 
-## Deploys: off by default
+## Deploys
 
-Nothing on this branch deploys automatically.
-
-- **Vercel Git integration** is disabled by `"git": { "deploymentEnabled": false }`
-  in `vercel.json`, for any commit that contains it.
-- **GitHub Actions** always runs checks on PRs and pushes to `main`, but the
-  deploy job only runs when the repository variable `DEPLOY_ENABLED` is `true`.
-  Pushing a feature branch without opening a PR runs nothing.
-
-To turn deploys on later:
-
-1. `bunx vercel link` locally, then read `.vercel/project.json` for the IDs.
-2. Add repo secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
-3. Add repo variable `DEPLOY_ENABLED` = `true`.
-
-After that: PRs get a preview URL in the job summary, and `main` goes to
-production.
-
-Heads-up: once this branch merges into `main`, the `vercel.json` setting also
-stops Vercel's own auto-deploys of `main`. That's intended, because Actions
-takes over deploying, but it means `main` won't deploy at all until step 3 is
-done.
+Vercel's Git integration deploys every push once the repo is connected to a
+Vercel project: branches get a preview URL, `main` goes to production.
+GitHub Actions only runs checks, on PRs and pushes to `main`.
 
 ## Notes to verify when setting up
 

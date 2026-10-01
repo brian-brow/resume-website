@@ -203,6 +203,10 @@ button {
   white-space: nowrap;
 }
 
+.bar-meta > :only-child {
+  margin-left: auto;
+}
+
 .bar-action {
   width: 220px;
   flex-shrink: 0;
@@ -417,7 +421,7 @@ button {
   place-items: center;
   padding: 0;
   border-radius: 50%;
-  background: var(--lily);
+  background: none;
   transition: transform 0.3s ease;
 }
 
@@ -450,6 +454,17 @@ button {
     at var(--lily-x) var(--lily-y)
   );
   transition-delay: 0s;
+}
+
+/* writing: on top of the menu at /writing */
+
+.layer-writing {
+  z-index: 2;
+  visibility: hidden;
+}
+
+.is-writing .layer-writing {
+  visibility: visible;
 }
 
 .play-grid {
@@ -510,7 +525,8 @@ button {
     border-left: 0;
   }
 
-  .layer-play {
+  .layer-play,
+  .layer-writing {
     overflow-y: auto;
   }
 

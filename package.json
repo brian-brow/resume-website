@@ -22,6 +22,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "latest",
     "typescript": "^5",
-    "vite": "latest"
+    "vite": "latest",
+    "wrangler": "^4.145.0"
   }
 }

@@ -1,9 +1,4 @@
-# PRs  → checks (+ a Vercel preview deploy once enabled)
-# main → checks (+ a Vercel production deploy once enabled)
-#
-# Deploys are OFF until you set the repository variable DEPLOY_ENABLED=true
-# (Settings → Secrets and variables → Actions → Variables). Checks always run.
-name: CI / Deploy
+name: CI
 
 on:
   push:
@@ -51,12 +46,6 @@ jobs:
         run: wasm-pack build --target web --release
         working-directory: crates/pond
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pond-pkg
-          path: crates/pond/pkg
-          retention-days: 1
-
       # ---------- Bun / TypeScript ----------
       - uses: oven-sh/setup-bun@v2
 
@@ -71,40 +60,3 @@ jobs:
 
       - name: Build site
         run: bun run build
-
-  deploy:
-    name: Deploy to Vercel
-    needs: check
-    runs-on: ubuntu-latest
-    if: >-
-      vars.DEPLOY_ENABLED == 'true' &&
-      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-      PROD_FLAG: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: pond-pkg
-          path: crates/pond/pkg
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install
-        run: bun install --frozen-lockfile
-
-      - name: Pull Vercel project settings
-        run: bunx vercel pull --yes --environment=$VERCEL_ENV --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build for Vercel
-        run: bunx vercel build $PROD_FLAG --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy prebuilt output
-        run: |
-          url=$(bunx vercel deploy --prebuilt $PROD_FLAG --token=${{ secrets.VERCEL_TOKEN }})
-          echo "### Deployed to $VERCEL_ENV: $url" >> "$GITHUB_STEP_SUMMARY"

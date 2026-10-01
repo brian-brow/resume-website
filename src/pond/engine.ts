@@ -404,13 +404,13 @@ export class Pond implements PondCore {
           const dx = (crop.sx + i - b.x) / k;
           const dy = (crop.sy + j - b.y) / k;
           const u = dx * c + dy * s;
-          let v = -dx * s + dy * c;
-          if (u < 0) v -= wag * u * 0.5; // tail bends as it wags
+          const v = -dx * s + dy * c;
+          const tv = u < -3.6 ? v - wag * (u + 3.6) : v; // only the tail bends as it wags, from its root
           const body = (u / 4.6) ** 2 + (v / 1.7) ** 2;
-          const tail = u < -3.6 && u > -7.4 && Math.abs(v) < (-u - 3.6) * 0.7 + 0.4;
+          const tail = u < -3.6 && u > -7.4 && Math.abs(tv) < (-u - 3.6) * 0.7 + 0.4;
           const idx = j * crop.sw + i;
           if (body < 1 || tail) buf[idx] = FISH;
-          else if (body < 1.9 || (u < -3 && u > -8.4 && Math.abs(v) < (-u - 3) * 0.7 + 1.4)) buf[idx] = PAPER;
+          else if (body < 1.9 || (u < -3 && u > -8.4 && Math.abs(tv) < (-u - 3) * 0.7 + 1.4)) buf[idx] = PAPER;
         }
       }
     }
