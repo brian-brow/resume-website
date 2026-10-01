@@ -76,6 +76,8 @@ button {
 
 .stage {
   --t-zoom: 900ms;
+  --t-slide: 600ms;
+  --ease-slide: cubic-bezier(0.25, -0.3, 0.7, 0);
   --t-text: 150ms;
 
   position: relative;
@@ -430,30 +432,108 @@ button {
   transform: scale(1.06);
 }
 
-/* play: on top of the menu; ripples out of the lily pad at /play, back into it on the way out */
+/* play: the bio dips, then flies up and out, uncovering the pond beneath it; the projects screen appears once it is gone */
+
+.bio-pond,
+.room-bio {
+  grid-area: 1 / 1;
+}
+
+/* covers the row gap, so the line under the bio leaves with it */
+.bio-pond {
+  margin-bottom: -1px;
+}
+
+/* clips the bio's extension at the top line, leaving the right column free for the flap to swing over the bar */
+.layer-inside .grid {
+  clip-path: polygon(
+    0 0,
+    50% 0,
+    50% -100vh,
+    calc(100% + 100vw) -100vh,
+    calc(100% + 100vw) calc(100% + 100vh),
+    0 calc(100% + 100vh)
+  );
+}
+
+/* paper continuing above the bio, seen only while it dips */
+.room-bio::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 100%;
+  height: 100%;
+  background: var(--paper);
+}
+
+.room-bio {
+  z-index: 1;
+  overflow: visible;
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.room-bio,
+.room-play .chip,
+.room-play .cards {
+  transition: transform var(--t-slide) var(--ease-slide);
+}
+
+.is-play .room-bio {
+  transform: translateY(-130%);
+}
+
+/* the play room's chip leaves out the left and its cards out the bottom, each just clearing the room's padding */
+.layer-inside .room-play {
+  overflow: visible;
+}
+
+.is-play .room-play .chip {
+  transform: translateX(calc(-100% - var(--pad) - 1px));
+}
+
+.is-play .room-play .cards {
+  transform: translateY(calc(100% + 27px));
+}
+
+/* the links card is a split-flap: it falls over the equator onto writing, its back is Play's info card, and Play's list waits behind it */
+
+.flip-under,
+.flap {
+  grid-area: 1 / 2;
+  display: grid;
+}
+
+.flap {
+  z-index: 1;
+  transform-style: preserve-3d;
+  /* hinge on the middle of the 1px row gap, so it lands exactly on the bottom row */
+  transform-origin: 50% calc(100% + 0.5px);
+  transform: perspective(1500px) rotateX(0);
+  transition: transform var(--t-slide) cubic-bezier(0.55, 0, 0.85, 0.35);
+}
+
+.is-play .flap {
+  transform: perspective(1500px) rotateX(-180deg);
+}
+
+.flap > * {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+}
+
+.flap-back {
+  display: grid;
+  transform: rotateX(180deg);
+}
 
 .layer-play {
   z-index: 2;
   visibility: hidden;
-  clip-path: circle(0 at var(--lily-x) var(--lily-y));
-  transition:
-    clip-path var(--t-zoom) var(--ease-zoom),
-    visibility 0s linear var(--t-zoom);
+  transition: visibility 0s;
 }
 
 .is-play .layer-play {
   visibility: visible;
-  /* radius reaches the farthest screen corner */
-  clip-path: circle(
-    max(
-      hypot(var(--lily-x), var(--lily-y)),
-      hypot(100vw - var(--lily-x), var(--lily-y)),
-      hypot(var(--lily-x), 100dvh - var(--lily-y)),
-      hypot(100vw - var(--lily-x), 100dvh - var(--lily-y))
-    )
-    at var(--lily-x) var(--lily-y)
-  );
-  transition-delay: 0s;
+  transition-delay: var(--t-slide);
 }
 
 /* writing: on top of the menu at /writing */
@@ -478,6 +558,11 @@ button {
 
 .play-stage {
   grid-row: span 2;
+}
+
+.boids-tank {
+  position: absolute;
+  inset: 0;
 }
 
 .play-list {
@@ -525,6 +610,20 @@ button {
     border-left: 0;
   }
 
+  .flip-under,
+  .flap-back {
+    display: none;
+  }
+
+  .layer-inside .grid {
+    clip-path: inset(0);
+  }
+
+  .flap {
+    grid-area: auto;
+    transform: none !important;
+  }
+
   .layer-play,
   .layer-writing {
     overflow-y: auto;
@@ -546,7 +645,11 @@ button {
   .door > *,
   .panel,
   .door-arrow,
-  .lily {
+  .lily,
+  .room-bio,
+  .room-play .chip,
+  .room-play .cards,
+  .flap {
     transition: none !important;
   }
 }

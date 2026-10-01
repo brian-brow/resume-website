@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createCaustics } from "./caustics";
 import { Pond, type PondCore } from "./engine";
 import { DOT, PondLoop } from "./loop";
 
@@ -9,7 +10,7 @@ const PondContext = createContext<PondLoop | null>(null);
  * every window is positioned against (the full-screen layers).
  */
 export function PondProvider({ children, core }: { children: ReactNode; core?: () => PondCore }) {
-  const [loop] = useState(() => new PondLoop(core ? core() : new Pond(480, 300)));
+  const [loop] = useState(() => new PondLoop(core ? core() : new Pond(480, 300, { water: createCaustics() ?? undefined })));
   useEffect(() => {
     loop.start();
     return () => loop.stop();
@@ -74,12 +75,14 @@ export function offsetInLayer(el: HTMLElement): { left: number; top: number } {
 interface PondWindowProps {
   /** Pause painting while this window is hidden. */
   active?: boolean;
+  /** The boids live inside this window while it is mounted. */
+  tank?: boolean;
   className?: string;
   children?: ReactNode;
 }
 
 /** A cell that shows its part of the shared pond. Children render on top. */
-export function PondWindow({ active = true, className, children }: PondWindowProps) {
+export function PondWindow({ active = true, tank = false, className, children }: PondWindowProps) {
   const loop = usePondLoop();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,12 +96,14 @@ export function PondWindow({ active = true, className, children }: PondWindowPro
     handleRef.current = handle;
     const measure = () => {
       const { left, top } = offsetInLayer(wrap);
-      loop.setCrop(handle, {
+      const crop = {
         sx: Math.round(left / DOT),
         sy: Math.round(top / DOT),
         sw: Math.max(1, Math.ceil(wrap.clientWidth / DOT)),
         sh: Math.max(1, Math.ceil(wrap.clientHeight / DOT)),
-      });
+      };
+      loop.setCrop(handle, crop);
+      if (tank) loop.setTank(crop);
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -108,9 +113,10 @@ export function PondWindow({ active = true, className, children }: PondWindowPro
       ro.disconnect();
       window.removeEventListener("resize", measure);
       loop.remove(handle);
+      if (tank) loop.setTank(null);
       handleRef.current = null;
     };
-  }, [loop]);
+  }, [loop, tank]);
 
   useEffect(() => {
     if (handleRef.current) loop.setActive(handleRef.current, active);

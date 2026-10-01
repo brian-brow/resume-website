@@ -2,7 +2,7 @@ import { forwardRef, useState, type MouseEvent, type RefObject } from "react";
 import { Link } from "../lib/router";
 import { PondWindow, usePondPad } from "../pond/react";
 import { ArrowLeft } from "./icons";
-import { projects } from "./Play";
+import { ProjectInfo, ProjectList, projects, type Project } from "./Play";
 import { useClock } from "./useClock";
 import { posts } from "./Writing";
 
@@ -12,6 +12,8 @@ interface InsideProps {
   onLeave: () => void;
   padRef: RefObject<HTMLButtonElement | null>;
   onBrowse: () => void;
+  /** The project Play shows, for the cards the links flap reveals. */
+  project: Project;
 }
 
 const links = [
@@ -24,7 +26,7 @@ const links = [
 const isMail = (href: string) => href.startsWith("mailto:");
 
 /** The four rooms behind the door. */
-export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside({ open, pondActive, onLeave, padRef, onBrowse }, backRef) {
+export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside({ open, pondActive, onLeave, padRef, onBrowse, project }, backRef) {
   const time = useClock();
   usePondPad(padRef);
   const [copied, setCopied] = useState(false);
@@ -55,6 +57,7 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
       </header>
 
       <main className="grid">
+        <PondWindow className="cell bio-pond" active={pondActive} />
         <section className="cell room room-bio" aria-labelledby="bio-h">
           <h2 id="bio-h" className="label">01 — Bio</h2>
           <p className="bio">Computer science graduate from the University of Florida.</p>
@@ -64,19 +67,28 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
           </div>
         </section>
 
-        <section className="cell room room-links" aria-labelledby="links-h">
-          <h2 id="links-h" className="label">02 — Links</h2>
-          <nav className="rows">
-            {links.map((l) => (
-              <a key={l.label} className="row row-link" href={l.href} onClick={isMail(l.href) ? (e) => copy(e, l.href) : undefined}>
-                <span>{l.label}</span>
-                <span className="label" aria-live="polite">
-                  {copied && isMail(l.href) ? "Copied" : l.detail} ↗
-                </span>
-              </a>
-            ))}
-          </nav>
-        </section>
+        {/* going to Play, the links flap falls over the equator, revealing Play's list behind it and landing as Play's info */}
+        <div className="flip-under" inert aria-hidden="true">
+          <ProjectList project={project} />
+        </div>
+        <div className="flap">
+          <section className="cell room room-links" aria-labelledby="links-h">
+            <h2 id="links-h" className="label">02 — Links</h2>
+            <nav className="rows">
+              {links.map((l) => (
+                <a key={l.label} className="row row-link" href={l.href} onClick={isMail(l.href) ? (e) => copy(e, l.href) : undefined}>
+                  <span>{l.label}</span>
+                  <span className="label" aria-live="polite">
+                    {copied && isMail(l.href) ? "Copied" : l.detail} ↗
+                  </span>
+                </a>
+              ))}
+            </nav>
+          </section>
+          <div className="flap-back" inert aria-hidden="true">
+            <ProjectInfo project={project} />
+          </div>
+        </div>
 
         <PondWindow className="cell room room-play" active={pondActive}>
           <h2 className="label chip">03 — Play</h2>

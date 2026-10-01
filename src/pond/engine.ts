@@ -1,5 +1,5 @@
 /**
- * Pond simulation core: water surface + 1-bit Bayer dither + boids.
+ * Pond simulation core: caustic water + 1-bit Bayer dither + boids.
  *
  * Plain TypeScript with no DOM or React. Everything happens in "field" units,
  * where 1 unit = one dither dot (DOT css pixels on screen). The field is the
@@ -27,13 +27,15 @@ export interface PondCore {
   poke(x: number, y: number, t: number): void;
   /** Pin the lily pad (PADS[LILY]) at a field position with radius r in dots. It stops drifting but still breathes. */
   setLily(x: number, y: number, r: number): void;
+  /** Confine the boids to a field rectangle. The first tank spawns them evenly around its outside, so they rush in; null removes them. */
+  setTank(tank: Crop | null): void;
 }
 
 // Colours as little-endian ABGR for Uint32 views over ImageData
 const INK = 0xff87fedb;
 const PAPER = 0xff534039;
-const FLAT = 0xff739083;
-const ARC = 0xff7aae7c;
+// const FLAT = 0xff739083;
+// const ARC = 0xff7aae7c;
 const FISH = 0xff62636e;
 
 // Light direction for slope shading
@@ -51,13 +53,6 @@ const BAYER = (() => {
   for (let i = 0; i < 64; i++) out[i] = (b[i] + 0.5) / 64;
   return out;
 })();
-
-/** Directional waves: [kx, ky, amplitude, speed, phase] */
-const WAVES: ReadonlyArray<readonly [number, number, number, number, number]> = [
-  [0.06, 0.02, 1.3, 0.9, 0.0],
-  [-0.03, 0.075, 0.8, 1.2, 1.7],
-  [0.11, -0.05, 0.3, 1.4, 3.1],
-];
 
 /** Floating pads as fractions of the field: [x, y, radius (in dots), phase] */
 const PADS: ReadonlyArray<readonly [number, number, number, number]> = [
@@ -85,9 +80,12 @@ interface Ripple {
 }
 
 export interface PondOptions {
+  /** How many boids a tank spawns. */
   boids?: number;
   /** Deterministic random source, handy for tests. */
   random?: () => number;
+  /** Water tone per dot for time t, in the R channel of an RGBA buffer (width * height * 4). Without it the water is blank. */
+  water?: (t: number, width: number, height: number) => Uint8Array;
 }
 
 export class Pond implements PondCore {
@@ -96,35 +94,24 @@ export class Pond implements PondCore {
   boids: Boid[] = [];
 
   private t = 0;
+  private rand: () => number;
+  private count: number;
+  private tank: Crop | null = null;
+  private water: PondOptions["water"];
+  private tones: Uint8Array | null = null;
   private ripples: Ripple[] = [];
   private lastRipple = -1;
   private pointer: { x: number; y: number; t: number } | null = null;
-  private pads: Array<[number, number, number]> = [];
+  /* private */ pads: Array<[number, number, number]> = [];
   private lily: [number, number, number] | null = null;
-  private phases = new Float32Array(WAVES.length);
   private arcDist = new Float64Array(0);
-  private lightFall = new Float64Array(0);
-  private colCos = new Float64Array(0);
-  private colSin = new Float64Array(0);
-  private rowCos = new Float64Array(WAVES.length);
-  private rowSin = new Float64Array(WAVES.length);
 
   constructor(width: number, height: number, opts: PondOptions = {}) {
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
-    const rand = opts.random ?? Math.random;
-    const count = opts.boids ?? 42;
-    for (let i = 0; i < count; i++) {
-      const a = rand() * Math.PI * 2;
-      this.boids.push({
-        x: this.width * (0.1 + rand() * 0.8),
-        y: this.height * (0.1 + rand() * 0.8),
-        vx: Math.cos(a) * 30,
-        vy: Math.sin(a) * 30,
-        size: 0.8 + rand() * 0.45,
-        seed: rand() * Math.PI * 2,
-      });
-    }
+    this.rand = opts.random ?? Math.random;
+    this.count = opts.boids ?? 42;
+    this.water = opts.water;
     this.updateShapes(0);
     this.cacheFields();
   }
@@ -149,6 +136,12 @@ export class Pond implements PondCore {
     this.updateShapes(this.t);
   }
 
+  setTank(tank: Crop | null): void {
+    if (!tank) this.boids = [];
+    else if (!this.tank) this.spawn(tank);
+    this.tank = tank;
+  }
+
   poke(x: number, y: number, t: number): void {
     this.pointer = { x, y, t };
     if (t - this.lastRipple < 0.12) return;
@@ -160,9 +153,9 @@ export class Pond implements PondCore {
   step(t: number, dt: number): void {
     this.t = t;
     dt = Math.min(0.1, Math.max(0.001, dt));
-    for (let i = 0; i < WAVES.length; i++) this.phases[i] = WAVES[i][4] - WAVES[i][3] * t;
     this.ripples = this.ripples.filter((r) => t - r.t0 < 3.5);
     this.updateShapes(t);
+    this.tones = this.water?.(t, this.width, this.height) ?? null;
     this.stepBoids(dt, t);
   }
 
@@ -170,11 +163,9 @@ export class Pond implements PondCore {
     const t = this.t;
     const W = this.width;
     const H = this.height;
-    const phases = this.phases;
-    const nw = WAVES.length;
-    const pads = this.pads;
-    const S = W + 1;
-    const { arcDist, lightFall, rowCos, rowSin } = this;
+    // const pads = this.pads;
+    // const S = W + 1;
+    const { /* arcDist, */ tones } = this;
 
     const rip = this.ripples.map((r) => {
       const age = t - r.t0;
@@ -185,68 +176,41 @@ export class Pond implements PondCore {
     });
 
     // Swaying flat arcs
-    const arcR1 = H * 1.05 + 9 * Math.sin(t * 0.55);
-    const arcR2 = H * 0.8 + 7 * Math.sin(t * 0.55 + 0.8);
-
-    // Column half of each wave angle, split out by cos(a + b) = cos a cos b - sin a sin b
-    const sw = crop.sw;
-    if (this.colCos.length < nw * sw) {
-      this.colCos = new Float64Array(nw * sw);
-      this.colSin = new Float64Array(nw * sw);
-    }
-    const { colCos, colSin } = this;
-    for (let k = 0; k < nw; k++) {
-      for (let i = 0; i < sw; i++) {
-        const a = WAVES[k][0] * (crop.sx + i);
-        colCos[k * sw + i] = Math.cos(a);
-        colSin[k * sw + i] = Math.sin(a);
-      }
-    }
+    // const arcR1 = H * 1.05 + 9 * Math.sin(t * 0.55);
+    // const arcR2 = H * 0.8 + 7 * Math.sin(t * 0.55 + 0.8);
 
     let o = 0;
     for (let j = 0; j < crop.sh; j++) {
       const Y = crop.sy + j;
-      const warpX = 4 * Math.sin(Y * 0.031 + t * 0.4);
-      const arcSway = 5 * Math.sin(Y * 0.04 + t * 0.9);
-      for (let k = 0; k < nw; k++) {
-        const w = WAVES[k];
-        const b = w[0] * warpX + w[1] * Y + phases[k];
-        rowCos[k] = w[2] * Math.cos(b);
-        rowSin[k] = w[2] * Math.sin(b);
-      }
-      const row = Math.min(Y, H) * S;
-      for (let i = 0; i < sw; i++, o++) {
+      // const arcSway = 5 * Math.sin(Y * 0.04 + t * 0.9);
+      const waterRow = Math.min(Y, H - 1) * W;
+      // const row = Math.min(Y, H) * S;
+      for (let i = 0; i < crop.sw; i++, o++) {
         const X = crop.sx + i;
-        const f = row + Math.min(X, W);
+        // const f = row + Math.min(X, W);
 
-        const ad = arcDist[f] + arcSway;
-        if (Math.abs(ad - arcR1) < 5.5 || Math.abs(ad - arcR2) < 2) {
-          buf[o] = ARC;
-          continue;
-        }
+        // const ad = arcDist[f] + arcSway;
+        // if (Math.abs(ad - arcR1) < 5.5 || Math.abs(ad - arcR2) < 2) {
+        //   buf[o] = ARC;
+        //   continue;
+        // }
 
-        let onPad = false;
-        for (let p = 0; p < pads.length; p++) {
-          const dx = X - pads[p][0];
-          const dy = (Y - pads[p][1]) * 1.25;
-          if (dx * dx + dy * dy < pads[p][2]) {
-            onPad = true;
-            break;
-          }
-        }
-        if (onPad) {
-          buf[o] = FLAT;
-          continue;
-        }
+        // let onPad = false;
+        // for (let p = 0; p < pads.length; p++) {
+        //   const dx = X - pads[p][0];
+        //   const dy = (Y - pads[p][1]) * 1.25;
+        //   if (dx * dx + dy * dy < pads[p][2]) {
+        //     onPad = true;
+        //     break;
+        //   }
+        // }
+        // if (onPad) {
+        //   buf[o] = FLAT;
+        //   continue;
+        // }
 
-        // Surface slope from the summed waves
         let sx = 0;
         let sy = 0;
-        for (let k = 0; k < nw; k++) {
-          const c = colCos[k * sw + i] * rowCos[k] - colSin[k * sw + i] * rowSin[k];
-          sx += c * WAVES[k][0];
-          sy += c * WAVES[k][1];
-        }
         for (let r = 0; r < rip.length; r++) {
           const q = rip[r];
           const dx = X - q.x;
@@ -259,7 +223,8 @@ export class Pond implements PondCore {
           sy += (a * dy) / d;
         }
 
-        const tone = 0.06 + 0.42 * lightFall[f] + 1.5 * (sx * LX + sy * LY);
+        const water = tones ? tones[(waterRow + Math.min(X, W - 1)) * 4] / 255 : 0;
+        const tone = water + 1.5 * (sx * LX + sy * LY);
         buf[o] = tone > BAYER[(Y & 7) * 8 + (X & 7)] ? INK : PAPER;
       }
     }
@@ -269,25 +234,34 @@ export class Pond implements PondCore {
 
   // ---------------------------------------------------------------------------
 
-  /** Arc distance and light falloff per dot, which depend only on the field size. One spare row and column covers crops that round past the edge. */
+  /** Arc distance per dot, which depends only on the field size. One spare row and column covers crops that round past the edge. */
   private cacheFields(): void {
     const W = this.width;
     const H = this.height;
     const S = W + 1;
     this.arcDist = new Float64Array(S * (H + 1));
-    this.lightFall = new Float64Array(S * (H + 1));
     const arcCx = W * 0.05;
     const arcCy = H * 1.35;
-    const lightX = W * 0.625;
-    const lightY = H * 0.38;
-    const lightR = W * 0.79;
     for (let Y = 0; Y <= H; Y++) {
-      for (let X = 0; X <= W; X++) {
-        const bx = X - lightX;
-        const by = Y - lightY;
-        this.arcDist[Y * S + X] = Math.hypot(X - arcCx, Y - arcCy);
-        this.lightFall[Y * S + X] = 1 - Math.min(Math.sqrt(bx * bx + by * by) / lightR, 1);
-      }
+      for (let X = 0; X <= W; X++) this.arcDist[Y * S + X] = Math.hypot(X - arcCx, Y - arcCy);
+    }
+  }
+
+  /** Boids evenly spaced around the tank's perimeter, OUT dots outside it, heading for its centre. */
+  private spawn({ sx, sy, sw, sh }: Crop): void {
+    const OUT = 20;
+    const n = this.count;
+    this.boids = [];
+    for (let i = 0; i < n; i++) {
+      let d = ((i + 0.5) / n) * 2 * (sw + sh);
+      let x: number;
+      let y: number;
+      if (d < sw) [x, y] = [sx + d, sy - OUT];
+      else if ((d -= sw) < sh) [x, y] = [sx + sw + OUT, sy + d];
+      else if ((d -= sh) < sw) [x, y] = [sx + sw - d, sy + sh + OUT];
+      else [x, y] = [sx - OUT, sy + sh - (d - sw)];
+      const a = Math.atan2(sy + sh / 2 - y, sx + sw / 2 - x);
+      this.boids.push({ x, y, vx: Math.cos(a) * 30, vy: Math.sin(a) * 30, size: 0.8 + this.rand() * 0.45, seed: this.rand() * Math.PI * 2 });
     }
   }
 
@@ -300,11 +274,13 @@ export class Pond implements PondCore {
   }
 
   private stepBoids(dt: number, t: number): void {
+    const T = this.tank;
+    if (!T) return;
     const B = this.boids;
     const n = B.length;
     const VIEW = 34;
     const SEP = 11;
-    const MAX_SPEED = 42;
+    const MAX_SPEED = 80;
     const MIN_SPEED = 18;
     const P = this.pointer && t - this.pointer.t < 0.6 ? this.pointer : null;
 
@@ -339,16 +315,16 @@ export class Pond implements PondCore {
       fx += sx * 5; // separation
       fy += sy * 5;
 
-      for (const [px, py, r2] of this.pads) {
-        const dx = b.x - px;
-        const dy = b.y - py;
-        const d = Math.hypot(dx, dy) + 0.01;
-        const r = Math.sqrt(r2) + 14;
-        if (d < r) {
-          fx += (dx / d) * (r - d) * 14;
-          fy += (dy / d) * (r - d) * 14;
-        }
-      }
+      // for (const [px, py, r2] of this.pads) {
+      //   const dx = b.x - px;
+      //   const dy = b.y - py;
+      //   const d = Math.hypot(dx, dy) + 0.01;
+      //   const r = Math.sqrt(r2) + 14;
+      //   if (d < r) {
+      //     fx += (dx / d) * (r - d) * 14;
+      //     fy += (dy / d) * (r - d) * 14;
+      //   }
+      // }
 
       if (P) {
         const dx = b.x - P.x;
@@ -360,11 +336,14 @@ export class Pond implements PondCore {
         }
       }
 
-      const m = 24; // soft walls
-      if (b.x < m) fx += (m - b.x) * 8;
-      if (b.x > this.width - m) fx -= (b.x - this.width + m) * 8;
-      if (b.y < m) fy += (m - b.y) * 8;
-      if (b.y > this.height - m) fy -= (b.y - this.height + m) * 8;
+      // soft walls of the tank, much harder from outside so new boids rush in
+      const out = b.x < T.sx || b.x > T.sx + T.sw || b.y < T.sy || b.y > T.sy + T.sh;
+      const m = 24;
+      const k = out ? 60 : 16;
+      if (b.x < T.sx + m) fx += (T.sx + m - b.x) * k;
+      if (b.x > T.sx + T.sw - m) fx -= (b.x - T.sx - T.sw + m) * k;
+      if (b.y < T.sy + m) fy += (T.sy + m - b.y) * k;
+      if (b.y > T.sy + T.sh - m) fy -= (b.y - T.sy - T.sh + m) * k;
 
       fx += Math.sin(t * 0.7 + b.seed * 3) * 6; // wander
       fy += Math.cos(t * 0.6 + b.seed * 2) * 6;

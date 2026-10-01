@@ -69,6 +69,12 @@ export class PondLoop {
     this.requestStill();
   }
 
+  /** Confine the boids to a crop of the field; null removes them. */
+  setTank(crop: Crop | null): void {
+    this.core.setTank(crop);
+    this.requestStill();
+  }
+
   setActive(w: PondWindowHandle, active: boolean): void {
     w.active = active;
     if (active) this.requestStill();

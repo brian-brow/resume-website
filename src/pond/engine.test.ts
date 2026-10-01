@@ -10,15 +10,24 @@ function seeded(seed: number) {
 }
 
 describe("Pond", () => {
-  test("boids stay inside the pond", () => {
+  test("boids only exist while there is a tank", () => {
     const pond = new Pond(480, 300, { random: seeded(1) });
+    expect(pond.boids.length).toBe(0);
+    pond.setTank({ sx: 0, sy: 0, sw: 240, sh: 300 });
+    expect(pond.boids.length).toBe(42);
+    pond.setTank(null);
+    expect(pond.boids.length).toBe(0);
+  });
+
+  test("boids spawn outside the tank, rush in, and stay", () => {
+    const tank = { sx: 0, sy: 20, sw: 240, sh: 280 };
+    const inside = (b: { x: number; y: number }) =>
+      b.x > tank.sx - 10 && b.x < tank.sx + tank.sw + 10 && b.y > tank.sy - 10 && b.y < tank.sy + tank.sh + 10;
+    const pond = new Pond(480, 300, { random: seeded(4) });
+    pond.setTank(tank);
+    expect(pond.boids.some(inside)).toBe(false);
     for (let i = 1; i <= 900; i++) pond.step(i / 30, 1 / 30);
-    for (const b of pond.boids) {
-      expect(b.x).toBeGreaterThan(-20);
-      expect(b.x).toBeLessThan(500);
-      expect(b.y).toBeGreaterThan(-20);
-      expect(b.y).toBeLessThan(320);
-    }
+    expect(pond.boids.every(inside)).toBe(true);
   });
 
   test("render is a 1-bit dither plus flat shape and fish colours", () => {
@@ -33,6 +42,7 @@ describe("Pond", () => {
 
   test("resize keeps boids proportional", () => {
     const pond = new Pond(480, 300, { random: seeded(3) });
+    pond.setTank({ sx: 0, sy: 0, sw: 240, sh: 300 });
     const before = pond.boids[0].x / 480;
     pond.resize(960, 600);
     expect(pond.boids[0].x / 960).toBeCloseTo(before, 6);

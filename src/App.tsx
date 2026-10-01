@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Home } from "./components/Home";
 import { Inside } from "./components/Inside";
-import { Play } from "./components/Play";
+import { Play, projects } from "./components/Play";
 import { Writing } from "./components/Writing";
 import { go, up, usePath } from "./lib/router";
 import { offsetInLayer, usePondStage } from "./pond/react";
@@ -15,6 +15,10 @@ export default function App() {
   const writing = isWriting(path);
   // The menu stays zoomed in underneath the projects and posts screens
   const open = path === "/menu" || play || writing;
+  // Once closed the URL has left /play, so keep showing the last project
+  const playSlug = useRef<string | undefined>(undefined);
+  if (play) playSlug.current = path.split("/")[2];
+  const project = projects.find((p) => p.slug === playSlug.current) ?? projects[0];
   const [moving, setMoving] = useState(false);
   const stageRef = usePondStage<HTMLDivElement>();
   const doorRef = useRef<HTMLButtonElement>(null);
@@ -103,8 +107,9 @@ export default function App() {
         onLeave={() => up("/")}
         padRef={lilyRef}
         onBrowse={() => go("/play")}
+        project={project}
       />
-      <Play ref={playRef} open={play} slug={path.split("/")[2]} />
+      <Play ref={playRef} open={play} project={project} />
       <Writing ref={writingRef} open={writing} slug={path.split("/")[2]} />
     </div>
   );

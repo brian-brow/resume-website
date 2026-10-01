@@ -1,5 +1,6 @@
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef } from "react";
 import { Link, up } from "../lib/router";
+import { PondWindow } from "../pond/react";
 import ConnectFour from "../play/connectfour/ConnectFour";
 import SandSim from "../play/sandsim/SandSim";
 import WFCollapse from "../play/wfcollapse/WFCollapse";
@@ -8,11 +9,22 @@ import { useClock } from "./useClock";
 
 interface PlayProps {
   open: boolean;
-  /** The selected project from /play/<slug>; the first project when missing or unknown. */
-  slug?: string;
+  project: Project;
+}
+
+/** The pond itself, with the boids confined to it. */
+function Boids() {
+  return <PondWindow className="boids-tank" tank />;
 }
 
 export const projects = [
+  {
+    slug: "boids",
+    title: "Boids",
+    status: "Simulation",
+    info: "Fish that flock using separation, alignment and cohesion, swimming over caustic water. They scatter from the cursor.",
+    Stage: Boids,
+  },
   {
     slug: "connect-four",
     title: "Connect Four",
@@ -36,29 +48,39 @@ export const projects = [
   },
 ];
 
-/** The projects screen: the selected project, the list, and its info. */
-export const Play = forwardRef<HTMLButtonElement, PlayProps>(function Play({ open, slug }, backRef) {
-  const time = useClock();
-  const layerRef = useRef<HTMLDivElement>(null);
-  // While the ripple closes the URL has already left /play, so keep showing the last project
-  const lastSlug = useRef(slug);
-  if (open) lastSlug.current = slug;
-  const project = projects.find((p) => p.slug === lastSlug.current) ?? projects[0];
-  const [live, setLive] = useState(open);
+export type Project = (typeof projects)[number];
 
-  // Unmount the project only once the ripple has fully closed over it
-  useEffect(() => {
-    if (open) {
-      setLive(true);
-      return;
-    }
-    const ms = parseFloat(getComputedStyle(layerRef.current!).getPropertyValue("--t-zoom"));
-    const id = setTimeout(() => setLive(false), ms);
-    return () => clearTimeout(id);
-  }, [open]);
+/** Every project, with the shown one marked. */
+export function ProjectList({ project }: { project: Project }) {
+  return (
+    <nav className="cell play-list" aria-label="Projects">
+      <div className="rows rows-ink">
+        {projects.map((p) => (
+          <Link key={p.slug} className="row row-link" href={`/play/${p.slug}`} replace aria-current={p === project ? "page" : undefined}>
+            <span>{p.title}</span>
+            <span className="label">{p.status}</span>
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+export function ProjectInfo({ project }: { project: Project }) {
+  return (
+    <section className="cell play-info" aria-label={project.title}>
+      <h2 className="label">{project.title}</h2>
+      <p className="bio">{project.info}</p>
+    </section>
+  );
+}
+
+/** The projects screen: the selected project, the list, and its info. */
+export const Play = forwardRef<HTMLButtonElement, PlayProps>(function Play({ open, project }, backRef) {
+  const time = useClock();
 
   return (
-    <div ref={layerRef} className="layer layer-play" inert={!open}>
+    <div className="layer layer-play" data-pond-layer inert={!open}>
       <header className="bar">
         <div className="bar-mark">BB</div>
         <button ref={backRef} type="button" className="bar-action" onClick={() => up("/menu")}>
@@ -72,30 +94,11 @@ export const Play = forwardRef<HTMLButtonElement, PlayProps>(function Play({ ope
 
       <main className="play-grid">
         <section className="cell play-stage" aria-label={project.title}>
-          {(open || live) && <project.Stage key={project.slug} />}
+          {open && <project.Stage key={project.slug} />}
         </section>
 
-        <nav className="cell play-list" aria-label="Projects">
-          <div className="rows rows-ink">
-            {projects.map((p) => (
-              <Link
-                key={p.slug}
-                className="row row-link"
-                href={`/play/${p.slug}`}
-                replace
-                aria-current={p === project ? "page" : undefined}
-              >
-                <span>{p.title}</span>
-                <span className="label">{p.status}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        <section className="cell play-info" aria-labelledby="play-info-h">
-          <h2 id="play-info-h" className="label">{project.title}</h2>
-          <p className="bio">{project.info}</p>
-        </section>
+        <ProjectList project={project} />
+        <ProjectInfo project={project} />
       </main>
     </div>
   );
