@@ -29,14 +29,17 @@ export interface PondCore {
   setLily(x: number, y: number, r: number): void;
   /** Confine the boids to a field rectangle. The first tank spawns them evenly around its outside, so they rush in; null removes them. */
   setTank(tank: Crop | null): void;
+  setColours(colours: Colours): void;
 }
 
-// Colours as little-endian ABGR for Uint32 views over ImageData
-const INK = 0xff87fedb;
-const PAPER = 0xff534039;
+/** Colours as little-endian ABGR for Uint32 views over ImageData. */
+export interface Colours {
+  ink: number;
+  paper: number;
+  fish: number;
+}
 // const FLAT = 0xff739083;
 // const ARC = 0xff7aae7c;
-const FISH = 0xff62636e;
 
 // Light direction for slope shading
 const LX = 0.6;
@@ -105,6 +108,7 @@ export class Pond implements PondCore {
   /* private */ pads: Array<[number, number, number]> = [];
   private lily: [number, number, number] | null = null;
   private arcDist = new Float64Array(0);
+  private colours: Colours = { ink: 0xff87fedb, paper: 0xff534039, fish: 0xff739083 };
 
   constructor(width: number, height: number, opts: PondOptions = {}) {
     this.width = Math.max(1, width);
@@ -142,6 +146,10 @@ export class Pond implements PondCore {
     this.tank = tank;
   }
 
+  setColours(colours: Colours): void {
+    this.colours = colours;
+  }
+
   poke(x: number, y: number, t: number): void {
     this.pointer = { x, y, t };
     if (t - this.lastRipple < 0.12) return;
@@ -166,6 +174,7 @@ export class Pond implements PondCore {
     // const pads = this.pads;
     // const S = W + 1;
     const { /* arcDist, */ tones } = this;
+    const { ink, paper } = this.colours;
 
     const rip = this.ripples.map((r) => {
       const age = t - r.t0;
@@ -225,7 +234,7 @@ export class Pond implements PondCore {
 
         const water = tones ? tones[(waterRow + Math.min(X, W - 1)) * 4] / 255 : 0;
         const tone = water + 1.5 * (sx * LX + sy * LY);
-        buf[o] = tone > BAYER[(Y & 7) * 8 + (X & 7)] ? INK : PAPER;
+        buf[o] = tone > BAYER[(Y & 7) * 8 + (X & 7)] ? ink : paper;
       }
     }
 
@@ -388,8 +397,8 @@ export class Pond implements PondCore {
           const body = (u / 4.6) ** 2 + (v / 1.7) ** 2;
           const tail = u < -3.6 && u > -7.4 && Math.abs(tv) < (-u - 3.6) * 0.7 + 0.4;
           const idx = j * crop.sw + i;
-          if (body < 1 || tail) buf[idx] = FISH;
-          else if (body < 1.9 || (u < -3 && u > -8.4 && Math.abs(tv) < (-u - 3) * 0.7 + 1.4)) buf[idx] = PAPER;
+          if (body < 1 || tail) buf[idx] = this.colours.fish;
+          else if (body < 1.9 || (u < -3 && u > -8.4 && Math.abs(tv) < (-u - 3) * 0.7 + 1.4)) buf[idx] = this.colours.paper;
         }
       }
     }

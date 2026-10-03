@@ -3,6 +3,7 @@ import { Link, up } from "../lib/router";
 import { PondWindow } from "../pond/react";
 import ConnectFour from "../play/connectfour/ConnectFour";
 import SandSim from "../play/sandsim/SandSim";
+import Conway from "../play/conway/Conway";
 import WFCollapse from "../play/wfcollapse/WFCollapse";
 import { ArrowLeft } from "./icons";
 import { useClock } from "./useClock";
@@ -38,6 +39,13 @@ export const projects = [
     status: "Simulation",
     info: "A falling-sand simulation where particles interact with each other and their environment. Refactored from an older project into TypeScript.",
     Stage: SandSim,
+  },
+  {
+    slug: "life",
+    title: "Conways Game of Life",
+    status: "Simulation",
+    info: "PLUH.",
+    Stage: Conway,
   },
   {
     slug: "wave-function-collapse",

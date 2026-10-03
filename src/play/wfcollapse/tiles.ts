@@ -23,20 +23,20 @@ export interface Theme {
 
 export const THEMES: Record<'roads' | 'pond', Theme> = {
   roads: {
-    land: '#839073',
-    water: '#4e4a59',
-    road: '#394053',
-    edge: '#dbfe87',
-    detail: { color: '#dbfe87', width: 1.5, dash: '5 5' },
+    land: 'var(--lily)',
+    water: 'var(--stone)',
+    road: 'var(--paper)',
+    edge: 'var(--ink)',
+    detail: { color: 'var(--ink)', width: 1.5, dash: '5 5' },
     pad: null,
   },
   pond: {
-    land: '#7cae7a',
-    water: '#394053',
-    road: '#6e6362',
-    edge: '#4e4a59',
-    detail: { color: '#4e4a59', width: 12, dash: '1.5 4.5' },
-    pad: '#839073',
+    land: 'var(--accent)',
+    water: 'var(--paper)',
+    road: 'var(--line-dark)',
+    edge: 'var(--stone)',
+    detail: { color: 'var(--stone)', width: 12, dash: '1.5 4.5' },
+    pad: 'var(--lily)',
   },
 }
 
@@ -88,12 +88,12 @@ function draw(corners: string[], mids: string[], t: Theme): string {
     // The three corners outside a turn always match; the inside corner follows the curve instead of being a square
     const [a, b] = arms
     const inner = b === a + 1 ? b : a
-    body += `<rect width="${S}" height="${S}" fill="${fill(corners[(inner + 2) % 4])}"/>`
-    body += `<path d="M ${MIDS[a].join(' ')} Q ${C} ${C} ${MIDS[b].join(' ')} L ${CORNERS[inner].join(' ')} Z" fill="${fill(corners[inner])}"/>`
+    body += `<rect width="${S}" height="${S}" style="fill:${fill(corners[(inner + 2) % 4])}"/>`
+    body += `<path d="M ${MIDS[a].join(' ')} Q ${C} ${C} ${MIDS[b].join(' ')} L ${CORNERS[inner].join(' ')} Z" style="fill:${fill(corners[inner])}"/>`
   } else {
     corners.forEach((c, i) => {
       const [x, y] = QUADS[i]
-      body += `<rect x="${x}" y="${y}" width="${C}" height="${C}" fill="${fill(c)}"/>`
+      body += `<rect x="${x}" y="${y}" width="${C}" height="${C}" style="fill:${fill(c)}"/>`
     })
   }
   corners.forEach((c, i) => {
@@ -103,12 +103,12 @@ function draw(corners: string[], mids: string[], t: Theme): string {
   if (arms.length) {
     const paths = roadPaths(arms)
     const stroke = (color: string, width: number, extra = '') =>
-      paths.map(d => `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" ${extra}/>`).join('')
+      paths.map(d => `<path d="${d}" fill="none" style="stroke:${color}" stroke-width="${width}" ${extra}/>`).join('')
     body += stroke(t.edge, ROAD + 2)
     body += stroke(t.road, ROAD)
     body += stroke(t.detail.color, t.detail.width, `stroke-dasharray="${t.detail.dash}"`)
   }
-  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" shape-rendering="geometricPrecision">${body}</svg>`)}`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" width="100%" height="100%" shape-rendering="geometricPrecision">${body}</svg>`
 }
 
 /** Two arms on neighbouring edges */
@@ -131,7 +131,7 @@ function pad(qx: number, qy: number, h: number, color: string): string {
   const a = (h % 360) * Math.PI / 180
   const x1 = cx + r * Math.cos(a), y1 = cy + r * Math.sin(a)
   const x2 = cx + r * Math.cos(a + 0.6), y2 = cy + r * Math.sin(a + 0.6)
-  return `<path d="M ${cx} ${cy} L ${x2} ${y2} A ${r} ${r} 0 1 1 ${x1} ${y1} Z" fill="${color}"/>`
+  return `<path d="M ${cx} ${cy} L ${x2} ${y2} A ${r} ${r} 0 1 1 ${x1} ${y1} Z" style="fill:${color}"/>`
 }
 
 function hash(s: string): number {

@@ -68,7 +68,8 @@ export class SandGrid {
   render(ctx: CanvasRenderingContext2D): void {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     // let sandColors = ['', '#B8860C', '#E7B744', '#F1BB5E', '#F1D581']
-    let sandColors = ['', '#dbfe87', '#7cae7a']
+    const css = getComputedStyle(ctx.canvas)
+    let sandColors = ['', css.getPropertyValue('--ink'), css.getPropertyValue('--accent')]
     // ctx.fillStyle = '#458391'
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {

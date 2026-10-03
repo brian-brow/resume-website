@@ -6,7 +6,7 @@ const CELL = 56
 const GAP = 14
 const PADDING = 14
 const RING = CELL - 20
-const YOU = 'var(--ink)'
+const YOU = 'var(--lily)'
 const CPU = 'var(--accent)'
 const RING_EDGE = 'rgba(0,0,0,0.25)'
 

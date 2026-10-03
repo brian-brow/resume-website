@@ -209,6 +209,17 @@ button {
   margin-left: auto;
 }
 
+.bar-shuffle {
+  padding: 0;
+  background: none;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.bar-shuffle:hover {
+  opacity: 0.7;
+}
+
 .bar-action {
   width: 220px;
   flex-shrink: 0;
@@ -568,6 +579,11 @@ button {
 .play-list {
   overflow-y: auto;
   justify-content: flex-start;
+}
+
+.play-info {
+  background: var(--lily);
+  color: var(--paper);
 }
 
 .row[aria-current="page"] > :first-child::before {

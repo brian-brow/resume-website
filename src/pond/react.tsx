@@ -53,6 +53,15 @@ export function usePondPad(ref: RefObject<HTMLElement | null>) {
   }, [loop, ref]);
 }
 
+/** Paints the pond in these CSS hex colours. */
+export function usePondColours(ink: string, paper: string, fish: string) {
+  const loop = usePondLoop();
+  useEffect(() => loop.setColours({ ink: abgr(ink), paper: abgr(paper), fish: abgr(fish) }), [loop, ink, paper, fish]);
+}
+
+/** "#rrggbb" as little-endian ABGR. */
+const abgr = (hex: string) => (0xff000000 | (parseInt(hex.slice(5, 7), 16) << 16) | (parseInt(hex.slice(3, 5), 16) << 8) | parseInt(hex.slice(1, 3), 16)) >>> 0;
+
 function usePondLoop(): PondLoop {
   const loop = useContext(PondContext);
   if (!loop) throw new Error("Pond components must be inside <PondProvider>.");

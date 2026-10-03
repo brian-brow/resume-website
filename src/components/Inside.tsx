@@ -1,6 +1,7 @@
-import { forwardRef, useState, type MouseEvent, type RefObject } from "react";
+import { forwardRef, useEffect, useState, type MouseEvent, type RefObject } from "react";
 import { Link } from "../lib/router";
-import { PondWindow, usePondPad } from "../pond/react";
+import { palettes } from "../palettes";
+import { PondWindow, usePondColours, usePondPad } from "../pond/react";
 import { ArrowLeft } from "./icons";
 import { ProjectInfo, ProjectList, projects, type Project } from "./Play";
 import { useClock } from "./useClock";
@@ -30,6 +31,15 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
   const time = useClock();
   usePondPad(padRef);
   const [copied, setCopied] = useState(false);
+  const [palette, setPalette] = useState(palettes[0]);
+  usePondColours(palette.ink, palette.paper, palette.lily);
+  useEffect(() => {
+    for (const [k, v] of Object.entries(palette)) document.documentElement.style.setProperty(`--${k}`, v);
+  }, [palette]);
+  const shuffle = () => {
+    const others = palettes.filter((p) => p !== palette);
+    setPalette(others[Math.floor(Math.random() * others.length)]);
+  };
 
   /** Copies the address instead of opening a mail app; falls back to the mailto link if the clipboard is blocked. */
   const copy = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -52,6 +62,9 @@ export const Inside = forwardRef<HTMLButtonElement, InsideProps>(function Inside
           <span>Back</span>
         </button>
         <div className="bar-meta">
+          <button type="button" className="bar-shuffle" onClick={shuffle}>
+            Shuffle colours
+          </button>
           <span>{time}</span>
         </div>
       </header>

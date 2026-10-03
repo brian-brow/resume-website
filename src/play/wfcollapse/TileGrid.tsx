@@ -64,7 +64,7 @@ export default function TileGrid({ cols, rows, speed, theme }: TileGridProps) {
         {Array.from({ length: total }).map((_, i) => (
           <div key={i} style={{ overflow: 'hidden', border: images[i] ? undefined : '1px solid var(--line-dark)' }}>
             {images[i]
-              ? <img src={images[i]!} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <div style={{ width: '100%', height: '100%' }} dangerouslySetInnerHTML={{ __html: images[i]! }} />
               : <div className="label" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {boardRef.current!.getPossibilities()[i].length}
               </div>}

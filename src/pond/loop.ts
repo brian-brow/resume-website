@@ -1,4 +1,4 @@
-import type { Crop, PondCore } from "./engine";
+import type { Colours, Crop, PondCore } from "./engine";
 
 /** CSS pixels per dither dot. 3 = chunky, 2 = finer. */
 export const DOT = 3;
@@ -72,6 +72,11 @@ export class PondLoop {
   /** Confine the boids to a crop of the field; null removes them. */
   setTank(crop: Crop | null): void {
     this.core.setTank(crop);
+    this.requestStill();
+  }
+
+  setColours(colours: Colours): void {
+    this.core.setColours(colours);
     this.requestStill();
   }
 

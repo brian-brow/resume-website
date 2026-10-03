@@ -40,7 +40,9 @@ dithered pond, and an accent-coloured door that zooms into a four-room menu
 │   │   └── react.tsx        # <PondProvider>, <PondWindow>, usePondStage
 │   ├── lib/api.ts           # typed Hono client
 │   ├── lib/posts.ts         # parses src/posts into the post list
+│   ├── palettes.ts          # generated colour palettes the menu's Shuffle button picks from
 │   └── styles.css
+├── scripts/palettes.ts      # writes src/palettes.ts: the default palette's OKLCH lightness and chroma, new hues
 ├── api/
 │   ├── index.ts             # Hono app → one Vercel Function
 │   └── dev.ts               # local API server on :3001
@@ -73,6 +75,7 @@ bun run dev        # site at http://localhost:5173
 bun run dev:api    # (second terminal) API at http://localhost:3001/api/health
 bun test
 bun run typecheck
+bun run palettes   # regenerate src/palettes.ts
 ```
 
 Rust (optional until the port starts):

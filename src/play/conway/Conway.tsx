@@ -1,12 +1,13 @@
 import { useRef, useEffect, useCallback } from 'react'
-import { SandGrid } from './sandgrid'
+import { LifeGrid } from './lifegrid'
 
 const SCALE = 5
+const GENERATIONS_PER_SECOND = 12
 
-export default function SandSim() {
+export default function Conway() {
   const canvasRef    = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const gridRef      = useRef<SandGrid | null>(null)
+  const gridRef      = useRef<LifeGrid | null>(null)
   const mousePos     = useRef<{ x: number; y: number } | null>(null)
   const isPressed    = useRef<0 | 1 | 2 | null>(null)
 
@@ -35,26 +36,30 @@ export default function SandSim() {
     const resize = () => {
       canvas.width  = container.clientWidth
       canvas.height = container.clientHeight
-      gridRef.current = new SandGrid(canvas.width, canvas.height, SCALE)
+      gridRef.current = new LifeGrid(canvas.width, canvas.height, SCALE)
     }
 
     resize()
     window.addEventListener('resize', resize)
 
     let rafId: number
-    const loop = () => {
+    let lastStep = 0
+    const loop = (ms: number) => {
       const grid = gridRef.current!
       if (isPressed.current !== null && mousePos.current) {
         const gx     = Math.floor(mousePos.current.x / SCALE)
         const gy     = Math.floor(mousePos.current.y / SCALE)
         const radius = Math.floor(canvas.width * 0.1 / SCALE / 2)
         if (isPressed.current === 0) {
-          grid.spawn(gx, grid.rows - 1 - gy, radius)
+          grid.spawn(gx, gy, radius)
         } else if (isPressed.current === 2) {
-          grid.erase(gx, grid.rows - 1 - gy, radius)
+          grid.erase(gx, gy, radius)
         }
       }
-      grid.step()
+      if (ms - lastStep >= 1000 / GENERATIONS_PER_SECOND) {
+        grid.step()
+        lastStep = ms
+      }
       grid.render(ctx)
       if (mousePos.current) {
         const r = Math.floor(canvas.width * 0.1 / SCALE) * SCALE / 2
